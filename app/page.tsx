@@ -163,7 +163,15 @@ function Brand() {
   return (
     <a className="brand" href="#anasayfa" aria-label="Dinamik Okulları anasayfa">
       <span className="brand-mark">
-        <Image src="/images/logo.png" alt="Dinamik Okulları" width={170} height={77} sizes="88px" />
+        <Image
+          src="/images/logo.png"
+          alt="Dinamik Okulları"
+          width={170}
+          height={77}
+          sizes="88px"
+          priority
+          unoptimized
+        />
       </span>
       <span className="brand-copy">
         <strong>DİNAMİK</strong>
@@ -264,7 +272,7 @@ export default function Home() {
       <main id="main-content">
         <section className="hero" id="anasayfa" aria-labelledby="hero-title">
           <div className="hero-media" aria-hidden="true">
-            <Image src="/images/biomedical.jpg" alt="" fill priority sizes="100vw" />
+            <Image src="/images/hero-banner.png" alt="" fill priority sizes="100vw" />
           </div>
           <div className="hero-wash" aria-hidden="true" />
 
