@@ -71,8 +71,14 @@ const navigation: NavigationItem[] = [
   },
   { label: "Kadromuz", href: "https://samsun.dinamikokullari.com/kadromuz" },
   {
-    label: "Sosyal - Kültürel - Sportif Çalışmalar",
-    href: "https://samsun.dinamikokullari.com/faaliyetlerimiz",
+    label: "Galeri",
+    children: [
+      {
+        label: "Sosyal - Kültürel - Sportif Çalışmalar",
+        href: "https://samsun.dinamikokullari.com/faaliyetlerimiz",
+      },
+      { label: "Dinamik Okul Bölümlerimiz", href: "#bolumler" },
+    ],
   },
   { label: "Başarılar", href: "https://samsun.dinamikokullari.com/basarilarimiz" },
   { label: "İletişim", href: "#iletisim" },
@@ -176,6 +182,27 @@ const quickLinks: LinkItem[] = [
   { label: "Yayınlar", href: "#yayinlar", icon: BookOpen },
   { label: "Bize Ulaşın", href: "#iletisim", icon: MessageCircle },
 ];
+
+function InstagramIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect x="2" y="2" width="20" height="20" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
 
 function Brand({ variant = "header" }: { variant?: "header" | "footer" }) {
   const isFooter = variant === "footer";
@@ -479,7 +506,7 @@ export default function Home() {
                 target="_blank"
                 rel="noreferrer"
               >
-                <Camera size={16} aria-hidden="true" />
+                <InstagramIcon />
                 Instagram&apos;da Gör
               </a>
             </div>
