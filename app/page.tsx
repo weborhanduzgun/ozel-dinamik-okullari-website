@@ -159,24 +159,25 @@ const quickLinks: LinkItem[] = [
   { label: "Bize Ulaşın", href: "#iletisim", icon: MessageCircle },
 ];
 
-function Brand() {
+function Brand({ variant = "header" }: { variant?: "header" | "footer" }) {
+  const isFooter = variant === "footer";
+
   return (
-    <a className="brand" href="#anasayfa" aria-label="Dinamik Okulları anasayfa">
-      <span className="brand-mark">
-        <Image
-          src="/images/logo.png"
-          alt="Dinamik Okulları"
-          width={170}
-          height={77}
-          sizes="88px"
-          priority
-          unoptimized
-        />
-      </span>
-      <span className="brand-copy">
-        <strong>DİNAMİK</strong>
-        <small>MESLEKİ VE TEKNİK ANADOLU LİSESİ</small>
-      </span>
+    <a
+      className={`brand brand--${variant}`}
+      href="#anasayfa"
+      aria-label="Dinamik Okulları anasayfa"
+    >
+      <Image
+        className="brand-image"
+        src={isFooter ? "/images/footer-logo-dinamik.png" : "/images/dinamik-logo-retina.png"}
+        alt="Dinamik Okulları"
+        width={isFooter ? 125 : 170}
+        height={isFooter ? 35 : 77}
+        sizes={isFooter ? "125px" : "135px"}
+        priority={!isFooter}
+        unoptimized
+      />
     </a>
   );
 }
@@ -752,7 +753,7 @@ export default function Home() {
       <footer className="site-footer">
         <div className="container footer-main">
           <div className="footer-brand">
-            <Brand />
+            <Brand variant="footer" />
             <p>Meslek sahibi, gelecek sahibi.</p>
           </div>
           <div className="footer-links">
