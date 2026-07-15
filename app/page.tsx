@@ -1,6 +1,8 @@
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
+import { DesktopNavigation } from "./components/DesktopNavigation";
 import { MobileNavigation } from "./components/MobileNavigation";
+import type { NavigationItem } from "./components/navigation";
 import { RegistrationForm } from "./components/RegistrationForm";
 import {
   ArrowRight,
@@ -50,13 +52,29 @@ type Department = {
   accent: "teal" | "blue" | "green";
 };
 
-const navigation: LinkItem[] = [
+const navigation: NavigationItem[] = [
   { label: "Anasayfa", href: "#anasayfa" },
-  { label: "Okulumuz", href: "#okulumuz" },
-  { label: "Bölümler", href: "#bolumler" },
-  { label: "Öğrenci", href: "#ogrenci" },
-  { label: "Yayınlar", href: "#yayinlar" },
-  { label: "Galeri", href: "#galeri" },
+  {
+    label: "Bölümler",
+    children: [
+      { label: "Kimya", href: "#program-kimya" },
+      { label: "Elektrik - Elektronik", href: "#program-elektrik" },
+      { label: "Biyomedikal", href: "#program-biyomedikal" },
+    ],
+  },
+  {
+    label: "Okulumuz",
+    children: [
+      { label: "Okulumuz Hakkında", href: "https://samsun.dinamikokullari.com/hakkimizda" },
+      { label: "Okul Kıyafetlerimiz", href: "https://samsun.dinamikokullari.com/okul-kiyafetlerimiz" },
+    ],
+  },
+  { label: "Kadromuz", href: "https://samsun.dinamikokullari.com/kadromuz" },
+  {
+    label: "Sosyal - Kültürel - Sportif Çalışmalar",
+    href: "https://samsun.dinamikokullari.com/faaliyetlerimiz",
+  },
+  { label: "Başarılar", href: "https://samsun.dinamikokullari.com/basarilarimiz" },
   { label: "İletişim", href: "#iletisim" },
 ];
 
@@ -243,13 +261,7 @@ export default function Home() {
         <div className="container header-inner">
           <Brand />
 
-          <nav className="desktop-nav" aria-label="Ana navigasyon">
-            {navigation.map((item) => (
-              <a key={item.href} href={item.href}>
-                {item.label}
-              </a>
-            ))}
-          </nav>
+          <DesktopNavigation navigation={navigation} />
 
           <div className="header-actions">
             <a className="button button--header" href="#on-kayit">

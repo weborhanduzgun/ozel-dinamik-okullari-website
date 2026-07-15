@@ -47,6 +47,11 @@ test("keeps essential navigation and accessibility contracts", async () => {
   assert.match(html, /href="#main-content"[^>]*>\s*İçeriğe geç/i);
   assert.match(html, /<main id="main-content">/i);
   assert.match(html, /aria-label="Ana navigasyon"/i);
+  assert.match(html, /Bölümler[\s\S]*Kimya[\s\S]*Elektrik - Elektronik[\s\S]*Biyomedikal/i);
+  assert.match(html, /Okulumuz[\s\S]*Okulumuz Hakkında[\s\S]*Okul Kıyafetlerimiz/i);
+  assert.match(html, /Sosyal - Kültürel - Sportif Çalışmalar/i);
+  assert.match(html, /href="https:\/\/samsun\.dinamikokullari\.com\/kadromuz"/i);
+  assert.match(html, /href="https:\/\/samsun\.dinamikokullari\.com\/basarilarimiz"/i);
   assert.match(html, /aria-label="Hızlı erişim"/i);
   assert.match(html, /aria-label="WhatsApp üzerinden iletişime geçin"/i);
   assert.match(html, /href="tel:\+908502182806"/i);
