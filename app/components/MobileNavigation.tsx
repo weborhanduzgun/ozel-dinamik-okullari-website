@@ -4,7 +4,12 @@ import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import type { NavigationItem } from "./navigation";
 
-export function MobileNavigation({ navigation }: { navigation: NavigationItem[] }) {
+type MobileNavigationProps = {
+  navigation: NavigationItem[];
+  ctaHref?: string;
+};
+
+export function MobileNavigation({ navigation, ctaHref = "#on-kayit" }: MobileNavigationProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const menuId = useId();
@@ -79,7 +84,7 @@ export function MobileNavigation({ navigation }: { navigation: NavigationItem[] 
             </div>
           );
         })}
-        <a className="mobile-menu-cta" href="#on-kayit" onClick={closeMenu}>
+        <a className="mobile-menu-cta" href={ctaHref} onClick={closeMenu}>
           Ön Kayıt Talebi
         </a>
       </nav>
