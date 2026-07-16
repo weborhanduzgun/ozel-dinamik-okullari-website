@@ -1,13 +1,14 @@
 "use client";
 
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import type { NavigationItem } from "./navigation";
 
 export function MobileNavigation({ navigation }: { navigation: NavigationItem[] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const menuId = useId();
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const closeMenu = () => {
     setIsOpen(false);
@@ -18,7 +19,10 @@ export function MobileNavigation({ navigation }: { navigation: NavigationItem[] 
     if (!isOpen) return;
 
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") closeMenu();
+      if (event.key !== "Escape") return;
+
+      closeMenu();
+      menuButtonRef.current?.focus();
     };
 
     window.addEventListener("keydown", closeOnEscape);
@@ -28,6 +32,7 @@ export function MobileNavigation({ navigation }: { navigation: NavigationItem[] 
   return (
     <div className={`mobile-menu${isOpen ? " is-open" : ""}`}>
       <button
+        ref={menuButtonRef}
         type="button"
         aria-expanded={isOpen}
         aria-controls={menuId}
@@ -57,6 +62,7 @@ export function MobileNavigation({ navigation }: { navigation: NavigationItem[] 
                 type="button"
                 aria-expanded={isSubmenuOpen}
                 aria-controls={submenuId}
+                aria-haspopup="true"
                 onClick={() => setOpenSubmenu(isSubmenuOpen ? null : item.label)}
               >
                 {item.label}

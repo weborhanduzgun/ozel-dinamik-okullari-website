@@ -16,7 +16,12 @@ export function DesktopNavigation({ navigation }: { navigation: NavigationItem[]
     };
 
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpenMenu(null);
+      if (event.key !== "Escape" || openMenu === null) return;
+
+      navigationRef.current
+        ?.querySelector<HTMLButtonElement>('.desktop-nav-trigger[aria-expanded="true"]')
+        ?.focus();
+      setOpenMenu(null);
     };
 
     document.addEventListener("pointerdown", closeOnOutsideClick);
@@ -26,7 +31,7 @@ export function DesktopNavigation({ navigation }: { navigation: NavigationItem[]
       document.removeEventListener("pointerdown", closeOnOutsideClick);
       window.removeEventListener("keydown", closeOnEscape);
     };
-  }, []);
+  }, [openMenu]);
 
   return (
     <nav ref={navigationRef} className="desktop-nav" aria-label="Ana navigasyon">
@@ -55,6 +60,7 @@ export function DesktopNavigation({ navigation }: { navigation: NavigationItem[]
               type="button"
               aria-expanded={isOpen}
               aria-controls={submenuId}
+              aria-haspopup="true"
               onClick={() => setOpenMenu(isOpen ? null : menuKey)}
             >
               {item.label}

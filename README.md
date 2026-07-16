@@ -8,7 +8,7 @@ Dinamik Mesleki ve Teknik Anadolu Lisesi için hazırlanan modern, erişilebilir
 - Kimya, Elektrik-Elektronik ve Biyomedikal program tanıtımları
 - Okul, kampüs, rehberlik, yayınlar, galeri ve iletişim bölümleri
 - Klavye erişimi, belirgin odak durumları ve hareket azaltma desteği
-- Cloudflare Workers ve OpenAI Sites ile uyumlu vinext çıktısı
+- Cloudflare Pages için statik Next.js çıktısı; Workers ve OpenAI Sites için isteğe bağlı vinext çıktısı
 - Sunucu tarafında render edilen Türkçe SEO meta verileri
 
 ## Gereksinimler
@@ -30,6 +30,8 @@ npm test
 
 Bu komut üretim derlemesini oluşturur ve tamamlanmış sayfanın kritik içerik, meta veri ve erişilebilirlik sözleşmelerini doğrular.
 
+Cloudflare Pages üretim derlemesi `npm run build:vercel` komutunu ve `out` çıktı dizinini kullanır. Vinext uyumluluk derlemesi gerektiğinde `npm run build:vinext` çalıştırılabilir.
+
 ## İçerik kaynakları
 
 Kurumsal bilgiler okulun mevcut web sitesindeki `Hakkımızda` ve `Bize Ulaşın` sayfaları ile proje için sağlanan bölüm tanıtım metninden derlenmiştir. Dinamik başarı, takipçi veya kampanya rakamları sabit içerik olarak kullanılmamıştır.
@@ -42,5 +44,5 @@ Laboratuvar ve program kartlarında kullanılan temsili stok fotoğraflar Pexels
 - `app/globals.css`: Tasarım sistemi ve duyarlı düzen
 - `app/layout.tsx`: Türkçe meta veriler ve sayfa kabuğu
 - `public/images/`: Optimize edilmiş yerel görsel varlıklar
-- `tests/rendered-html.test.mjs`: Sunucu çıktısı sözleşme testleri
-- `.openai/hosting.json`: Sites barındırma yapılandırması
+- `tests/rendered-html.test.mjs`: Statik üretim çıktısı sözleşme testleri
+- `vite.config.ts` ve `worker/index.ts`: İsteğe bağlı vinext/Workers uyumluluk katmanı

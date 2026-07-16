@@ -8,7 +8,6 @@ import {
   ArrowRight,
   BookOpen,
   Building2,
-  Camera,
   CalendarDays,
   CheckCircle2,
   ChevronRight,
@@ -817,7 +816,7 @@ export default function Home() {
                 rel="noreferrer"
                 aria-label="Dinamik Okulları Samsun Instagram"
               >
-                <Camera size={19} />
+                <InstagramIcon size={19} />
               </a>
               <a
                 href="https://www.youtube.com/channel/UCmwV6um8k2UhRbSzQEhyM6g"
