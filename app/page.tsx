@@ -1,14 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { DesktopNavigation } from "./components/DesktopNavigation";
-import { MobileNavigation } from "./components/MobileNavigation";
-import { siteNavigation } from "./components/navigation";
+import { InstagramIcon, SiteFooter, SiteHeader } from "./components/SiteChrome";
 import { RegistrationForm } from "./components/RegistrationForm";
-import { ScrollAwareHeader } from "./components/ScrollAwareHeader";
 import {
   ArrowRight,
-  BookOpen,
   Building2,
   CalendarDays,
   CheckCircle2,
@@ -25,11 +21,8 @@ import {
   Play,
   School,
   ShieldCheck,
-  Sparkles,
   Trophy,
   Users,
-  Utensils,
-  Video,
   Wrench,
   Zap,
 } from "lucide-react";
@@ -78,7 +71,7 @@ const departments: Department[] = [
     id: "biyomedikal",
     slug: "biyomedikal-cihaz-teknolojileri",
     title: "Biyomedikal Cihaz Teknolojileri",
-    branch: "Tıbbi Görüntüleme Sistemleri",
+    branch: "Tıbbi Görüntüleme Sistemleri Dalı",
     description:
       "Tıbbi cihazların kurulumu, kullanımı, bakım süreçleri ve sağlık teknolojilerinin teknik altyapısına yönelik eğitim.",
     image: "/images/biomedical.jpg",
@@ -115,33 +108,6 @@ const benefits = [
   },
 ];
 
-const publications = [
-  {
-    type: "Yayın",
-    title: "Bilim, Kültür ve Sanat Dergilerimiz",
-    description: "Öğrencilerin bilimsel, kültürel ve sanatsal üretimleri.",
-    icon: BookOpen,
-    image: "/images/gallery-7.jpg",
-    href: "https://samsun.dinamikokullari.com/mayis-haziran-ayi-bilim-kultur-ve-sanat-dergimiz",
-  },
-  {
-    type: "Proje",
-    title: "Dijital Kimliğimle Varım",
-    description: "eTwinning ortaklığıyla güvenli ve bilinçli dijital yaşam.",
-    icon: Sparkles,
-    image: "/images/gallery-8.jpg",
-    href: "https://samsun.dinamikokullari.com/dijital-kimligimle-varim-projesinde-e-twinnig-proje-ortagiyiz-2",
-  },
-  {
-    type: "Rehberlik",
-    title: "Mesleki Gelişim İçerikleri",
-    description: "Kariyer, sınav ve ergenlik dönemine yönelik rehberlik.",
-    icon: Users,
-    image: "/images/gallery-3.jpg",
-    href: "https://samsun.dinamikokullari.com/rehberlik-mesleki-gelisim-dergisi",
-  },
-];
-
 const gallery = [
   { src: "/images/gallery-1.jpg", alt: "Dinamik öğrencilerinin kış etkinliği" },
   { src: "/images/gallery-2.jpg", alt: "Öğrencilerin açık hava etkinliği" },
@@ -156,54 +122,9 @@ const quickLinks: LinkItem[] = [
   { label: "Bölümler", href: "/bolumler", icon: GraduationCap },
   { label: "Rehberlik", href: "/rehberlik", icon: Users },
   { label: "Etkinlikler", href: "/faaliyetlerimiz", icon: CalendarDays },
-  { label: "Kampüs", href: "/hakkimizda", icon: Utensils },
-  { label: "Yayınlar", href: "/haberler", icon: BookOpen },
+  { label: "Kampüs", href: "/hakkimizda", icon: Building2 },
   { label: "Bize Ulaşın", href: "/iletisim", icon: MessageCircle },
 ];
-
-function InstagramIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <rect x="2" y="2" width="20" height="20" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-function Brand({ variant = "header" }: { variant?: "header" | "footer" }) {
-  const isFooter = variant === "footer";
-
-  return (
-    <Link
-      className={`brand brand--${variant}`}
-      href="/"
-      aria-label="Dinamik Okulları anasayfa"
-    >
-      <Image
-        className="brand-image"
-        src={isFooter ? "/images/footer-logo-dinamik.png" : "/images/dinamik-logo-retina.png"}
-        alt="Dinamik Okulları"
-        width={isFooter ? 125 : 170}
-        height={isFooter ? 35 : 77}
-        sizes={isFooter ? "125px" : "135px"}
-        priority={!isFooter}
-        unoptimized
-      />
-    </Link>
-  );
-}
 
 function SectionHeading({
   id,
@@ -265,30 +186,7 @@ export default function Home() {
         İçeriğe geç
       </a>
 
-      <ScrollAwareHeader>
-        <div className="container header-inner">
-          <Brand />
-
-          <DesktopNavigation navigation={siteNavigation} />
-
-          <div className="header-actions">
-            <Link className="button button--header" href="/on-kayit">
-              Ön Kayıt
-            </Link>
-            <a
-              className="button button--ghost-dark"
-              href="https://e-okul.meb.gov.tr/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              e-Okul
-              <ExternalLink size={14} aria-hidden="true" />
-            </a>
-          </div>
-
-          <MobileNavigation navigation={siteNavigation} ctaHref="/on-kayit" />
-        </div>
-      </ScrollAwareHeader>
+      <SiteHeader />
 
       <main id="main-content">
         <section className="hero" id="anasayfa" aria-labelledby="hero-title">
@@ -454,60 +352,6 @@ export default function Home() {
                   />
                 </figure>
               ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="news-section" id="yayinlar" aria-labelledby="news-title">
-          <div className="container">
-            <div className="news-heading">
-              <div>
-                <p className="eyebrow eyebrow--light">Dinamik&apos;ten</p>
-                <h2 id="news-title">Haberler &amp; Duyurular</h2>
-              </div>
-              <Link
-                className="button button--outline-light button--small"
-                href="/haberler"
-              >
-                Tüm Haberler
-                <ArrowRight size={15} aria-hidden="true" />
-              </Link>
-            </div>
-            <div className="news-grid">
-              {publications.map((publication) => {
-                const Icon = publication.icon;
-
-                return (
-                  <a
-                    className="news-card"
-                    href={publication.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    key={publication.title}
-                  >
-                    <span className="news-media">
-                      <Image
-                        src={publication.image}
-                        alt=""
-                        fill
-                        sizes="(max-width: 700px) calc(100vw - 32px), 30vw"
-                      />
-                    </span>
-                    <span className="news-content">
-                      <span className="news-meta">
-                        <Icon size={15} aria-hidden="true" />
-                        {publication.type}
-                      </span>
-                      <strong>{publication.title}</strong>
-                      <small>{publication.description}</small>
-                      <span className="news-link">
-                        Haberi incele
-                        <ArrowRight size={14} aria-hidden="true" />
-                      </span>
-                    </span>
-                  </a>
-                );
-              })}
             </div>
           </div>
         </section>
@@ -783,62 +627,7 @@ export default function Home() {
         </div>
       </nav>
 
-      <footer className="site-footer">
-        <div className="container footer-main">
-          <div className="footer-brand">
-            <Brand variant="footer" />
-            <p>Meslek sahibi, gelecek sahibi.</p>
-          </div>
-          <div className="footer-links">
-            <strong>Keşfet</strong>
-            <Link href="/hakkimizda">Okulumuz</Link>
-            <Link href="/bolumler">Bölümler</Link>
-            <Link href="/rehberlik">Öğrenci</Link>
-            <Link href="/galeri">Galeri</Link>
-          </div>
-          <div className="footer-links">
-            <strong>İletişim</strong>
-            <a href="tel:+903624655353">0362 465 53 53</a>
-            <a href="tel:+905467765060">0546 776 50 60</a>
-            <Link href="/iletisim">İletişim Bilgileri</Link>
-          </div>
-          <div className="footer-social">
-            <strong>Bizi Takip Edin</strong>
-            <div>
-              <a
-                href="https://www.instagram.com/dinamikokullarisamsun"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Dinamik Okulları Samsun Instagram"
-              >
-                <InstagramIcon size={19} />
-              </a>
-              <a
-                href="https://www.youtube.com/channel/UCmwV6um8k2UhRbSzQEhyM6g"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Dinamik Okulları Samsun YouTube"
-              >
-                <Video size={19} />
-              </a>
-            </div>
-          </div>
-        </div>
-        <div className="container footer-bottom">
-          <span>© 2026 Dinamik Mesleki ve Teknik Anadolu Lisesi</span>
-          <span>Samsun / Türkiye</span>
-        </div>
-      </footer>
-
-      <a
-        className="floating-whatsapp"
-        href="https://wa.me/905467765060"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="WhatsApp üzerinden iletişime geçin"
-      >
-        <MessageCircle size={25} aria-hidden="true" />
-      </a>
+      <SiteFooter />
     </div>
   );
 }

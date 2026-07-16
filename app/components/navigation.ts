@@ -34,7 +34,6 @@ export const siteNavigation: NavigationItem[] = [
     ],
   },
   { label: "Kadromuz", href: "/kadromuz" },
-  { label: "Haberler", href: "/haberler" },
   {
     label: "Galeri",
     href: "/galeri",

@@ -12,18 +12,12 @@ import {
   FlaskConical,
   GraduationCap,
   HeartPulse,
-  Mail,
-  MapPin,
-  Phone,
   ShieldCheck,
   Sparkles,
   Target,
   Users,
 } from "lucide-react";
-import { DesktopNavigation } from "../components/DesktopNavigation";
-import { MobileNavigation } from "../components/MobileNavigation";
-import { siteNavigation } from "../components/navigation";
-import { ScrollAwareHeader } from "../components/ScrollAwareHeader";
+import { SiteFooter, SiteHeader } from "../components/SiteChrome";
 import "./hakkimizda.css";
 
 export const metadata: Metadata = {
@@ -92,42 +86,12 @@ const qualityPrinciples = [
   "Bölgenin ücretsiz özel okul modelini nitelikli eğitimle sürdürülebilir kılmak.",
 ];
 
-function InstagramIcon() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-      <rect x="2" y="2" width="20" height="20" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="0.75" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 export default function AboutPage() {
   return (
     <div className="about-shell">
       <a className="skip-link" href="#about-content">İçeriğe geç</a>
 
-      <ScrollAwareHeader>
-        <div className="container header-inner">
-          <Link className="brand brand--header" href="/" aria-label="Dinamik Okulları anasayfa">
-            <Image
-              className="brand-image"
-              src="/images/dinamik-logo-retina.png"
-              alt="Dinamik Okulları"
-              width={170}
-              height={77}
-              sizes="142px"
-              priority
-              unoptimized
-            />
-          </Link>
-          <DesktopNavigation navigation={siteNavigation} />
-          <div className="header-actions">
-            <Link className="button button--header" href="/on-kayit">Ön Kayıt</Link>
-          </div>
-          <MobileNavigation navigation={siteNavigation} ctaHref="/on-kayit" />
-        </div>
-      </ScrollAwareHeader>
+      <SiteHeader />
 
       <main id="about-content">
         <section className="about-hero" aria-labelledby="about-title">
@@ -391,46 +355,7 @@ export default function AboutPage() {
         </section>
       </main>
 
-      <footer className="about-footer">
-        <div className="container about-footer-grid">
-          <div className="about-footer-brand">
-            <Link href="/" aria-label="Dinamik Okulları anasayfa">
-              <Image src="/images/footer-logo-dinamik.png" alt="Dinamik Okulları" width={125} height={35} unoptimized />
-            </Link>
-            <p>Meslek sahibi, gelecek sahibi.</p>
-            <div className="about-footer-social">
-              <a href="https://www.instagram.com/dinamikokullarisamsun" target="_blank" rel="noreferrer" aria-label="Instagram"><InstagramIcon /></a>
-              <a href="https://www.youtube.com/channel/UCmwV6um8k2UhRbSzQEhyM6g" target="_blank" rel="noreferrer" aria-label="YouTube"><span aria-hidden="true">▶</span></a>
-            </div>
-          </div>
-          <div className="about-footer-links">
-            <strong>Okulumuz</strong>
-            <Link href="/hakkimizda">Hakkımızda</Link>
-            <Link href="/bolumler">Bölümlerimiz</Link>
-            <Link href="/galeri">Galeri</Link>
-            <Link href="/on-kayit">Ön Kayıt</Link>
-          </div>
-          <div className="about-footer-links">
-            <strong>Öğrenci</strong>
-            <a href="https://e-okul.meb.gov.tr/" target="_blank" rel="noreferrer">e-Okul</a>
-            <Link href="/rehberlik">Rehberlik</Link>
-            <Link href="/haberler">Yayınlar</Link>
-            <Link href="/hakkimizda">Kampüs</Link>
-          </div>
-          <div className="about-footer-contact">
-            <strong>İletişim</strong>
-            <a href="tel:+905467765060"><Phone size={15} aria-hidden="true" /> 0546 776 50 60</a>
-            <a href="mailto:samsun@dinamikokullari.com"><Mail size={15} aria-hidden="true" /> samsun@dinamikokullari.com</a>
-            <a href="https://www.google.com/maps/search/?api=1&query=Toybelen+Mahallesi+Anadolu+Bulvar%C4%B1+No%3A225+%C4%B0lkad%C4%B1m+Samsun" target="_blank" rel="noreferrer">
-              <MapPin size={15} aria-hidden="true" /> Toybelen Mah. Anadolu Bulvarı No:225, İlkadım / Samsun
-            </a>
-          </div>
-        </div>
-        <div className="container about-footer-bottom">
-          <p>© {new Date().getFullYear()} Dinamik Mesleki ve Teknik Anadolu Lisesi</p>
-          <span>Ücretsiz, uygulamalı ve geleceğe dönük eğitim.</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -48,7 +48,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   scroll-padding-top: 78px;
 }
 
@@ -1627,15 +1626,6 @@ a {
   margin-top: 4px;
   color: var(--muted);
   font-size: 0.69rem;
-}
-
-.campus-section,
-.program-section,
-.guidance-section,
-.registration-section,
-.contact-section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 760px;
 }
 
 .registration-section {
