@@ -11,6 +11,11 @@ async function render() {
   });
 }
 
+async function readRoute(route) {
+  const relativePath = route === "/" ? "../out/index.html" : `../out${route}.html`;
+  return readFile(new URL(relativePath, import.meta.url), "utf8");
+}
+
 test("renders the completed Turkish school homepage in the static export", async () => {
   const response = await render();
   assert.equal(response.status, 200);
@@ -35,20 +40,65 @@ test("keeps essential navigation and accessibility contracts", async () => {
   assert.match(html, /href="#main-content"[^>]*>\s*İçeriğe geç/i);
   assert.match(html, /<main id="main-content">/i);
   assert.match(html, /aria-label="Ana navigasyon"/i);
+  assert.match(html, /href="\/bolumler"[^>]*>\s*Bölümler/i);
   assert.match(html, /Bölümler[\s\S]*Kimya[\s\S]*Elektrik - Elektronik[\s\S]*Biyomedikal/i);
-  assert.match(html, /Okulumuz[\s\S]*Okulumuz Hakkında[\s\S]*Okul Kıyafetlerimiz/i);
+  assert.match(html, /href="\/okulumuz"[^>]*>\s*Okulumuz/i);
+  assert.match(html, /Okulumuz[\s\S]*Hakkımızda[\s\S]*Okul Kıyafetlerimiz[\s\S]*Rehberlik/i);
   assert.match(
     html,
-    /Galeri[\s\S]*Sosyal - Kültürel - Sportif Çalışmalar[\s\S]*Dinamik Okul Bölümlerimiz/i,
+    /Galeri[\s\S]*Sosyal, Kültürel ve Sportif Çalışmalar/i,
   );
-  assert.match(html, /href="#bolumler"[^>]*>\s*Dinamik Okul Bölümlerimiz/i);
-  assert.match(html, /href="https:\/\/samsun\.dinamikokullari\.com\/kadromuz"/i);
-  assert.match(html, /href="https:\/\/samsun\.dinamikokullari\.com\/basarilarimiz"/i);
+  assert.match(html, /href="\/galeri"[^>]*>\s*Galeri/i);
+  assert.match(html, /href="\/haberler"[^>]*>\s*Haberler/i);
+  assert.match(html, /href="\/kadromuz"/i);
+  assert.match(html, /href="\/basarilarimiz"/i);
   assert.match(html, /aria-label="Hızlı erişim"/i);
   assert.match(html, /aria-label="WhatsApp üzerinden iletişime geçin"/i);
   assert.match(html, /href="tel:\+908502182806"/i);
   assert.match(html, /href="tel:\+903624655353"/i);
   assert.match(html, /aria-expanded="false"/i);
+});
+
+test("exports every primary frontend route with working internal navigation", async () => {
+  const routes = [
+    "/hakkimizda",
+    "/okulumuz",
+    "/bolumler",
+    "/bolumler/kimya-teknolojileri",
+    "/bolumler/elektrik-elektronik-teknolojileri",
+    "/bolumler/biyomedikal-cihaz-teknolojileri",
+    "/kadromuz",
+    "/okul-kiyafetlerimiz",
+    "/faaliyetlerimiz",
+    "/galeri",
+    "/basarilarimiz",
+    "/haberler",
+    "/rehberlik",
+    "/iletisim",
+    "/on-kayit",
+  ];
+
+  for (const route of routes) {
+    const html = await readRoute(route);
+    assert.match(html, /<main id="main-content">|<main id="about-content">/i, `${route} needs a main landmark`);
+    assert.match(html, /aria-label="Ana navigasyon"/i, `${route} needs shared navigation`);
+    assert.match(html, /Dinamik Okulları/i, `${route} needs the school brand`);
+  }
+});
+
+test("publishes only the three active branches from the provided program reference", async () => {
+  const pages = await Promise.all([
+    readRoute("/bolumler"),
+    readRoute("/bolumler/kimya-teknolojileri"),
+    readRoute("/bolumler/elektrik-elektronik-teknolojileri"),
+    readRoute("/bolumler/biyomedikal-cihaz-teknolojileri"),
+  ]);
+  const html = pages.join("\n");
+
+  assert.match(html, /Kimya Laboratuvarı Dalı/i);
+  assert.match(html, /Elektrik Tesisatları ve Dağıtımı Dalı/i);
+  assert.match(html, /Tıbbi Görüntüleme Sistemleri Dalı/i);
+  assert.doesNotMatch(html, /Petrol Endüstrisi|Asansör Sistemleri|Yaşam Destek ve Tedavi Cihazları/i);
 });
 
 test("renders the cinematic homepage composition while preserving the brand logos", async () => {

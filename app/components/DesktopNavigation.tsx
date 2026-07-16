@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { NavigationItem } from "./navigation";
 
@@ -10,7 +11,7 @@ export function DesktopNavigation({ navigation }: { navigation: NavigationItem[]
 
   useEffect(() => {
     const closeOnOutsideClick = (event: MouseEvent) => {
-      if (!navigationRef.current?.contains(event.target as Node)) {
+      if (navigationRef.current && !event.composedPath().includes(navigationRef.current)) {
         setOpenMenu(null);
       }
     };
@@ -38,9 +39,9 @@ export function DesktopNavigation({ navigation }: { navigation: NavigationItem[]
       {navigation.map((item, index) => {
         if (!item.children?.length) {
           return (
-            <a key={item.label} href={item.href}>
+            <Link key={item.label} href={item.href}>
               {item.label}
-            </a>
+            </Link>
           );
         }
 
@@ -52,25 +53,28 @@ export function DesktopNavigation({ navigation }: { navigation: NavigationItem[]
           <div
             className={`desktop-nav-item${isOpen ? " is-open" : ""}`}
             key={menuKey}
-            onMouseEnter={() => setOpenMenu(menuKey)}
-            onMouseLeave={() => setOpenMenu(null)}
           >
-            <button
-              className="desktop-nav-trigger"
-              type="button"
-              aria-expanded={isOpen}
-              aria-controls={submenuId}
-              aria-haspopup="true"
-              onClick={() => setOpenMenu(isOpen ? null : menuKey)}
-            >
-              {item.label}
-              <ChevronDown size={14} strokeWidth={2.2} aria-hidden="true" />
-            </button>
+            <div className="desktop-nav-label">
+              <Link className="desktop-nav-trigger" href={item.href}>
+                {item.label}
+              </Link>
+              <button
+                className="desktop-nav-toggle"
+                type="button"
+                aria-label={`${item.label} alt menüsünü ${isOpen ? "kapat" : "aç"}`}
+                aria-expanded={isOpen}
+                aria-controls={submenuId}
+                aria-haspopup="true"
+                onClick={() => setOpenMenu(isOpen ? null : menuKey)}
+              >
+                <ChevronDown size={14} strokeWidth={2.2} aria-hidden="true" />
+              </button>
+            </div>
             <div className="desktop-submenu" id={submenuId} hidden={!isOpen}>
               {item.children.map((child) => (
-                <a key={child.href} href={child.href} onClick={() => setOpenMenu(null)}>
+                <Link key={child.href} href={child.href} onClick={() => setOpenMenu(null)}>
                   {child.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

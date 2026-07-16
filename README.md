@@ -4,9 +4,9 @@ Dinamik Mesleki ve Teknik Anadolu Lisesi için hazırlanan modern, erişilebilir
 
 ## Özellikler
 
-- Referans tasarıma sadık, tek sayfalık kurumsal bilgi mimarisi
-- Kimya, Elektrik-Elektronik ve Biyomedikal program tanıtımları
-- Okul, kampüs, rehberlik, yayınlar, galeri ve iletişim bölümleri
+- Referans tasarıma sadık, ortak tasarım sistemine sahip çok sayfalı kurumsal bilgi mimarisi
+- Kimya, Elektrik-Elektronik ve Biyomedikal programları için ayrı, kaynak doğrulamalı detay sayfaları
+- Hakkımızda, kadro, kıyafet, rehberlik, faaliyet, galeri, başarı, yayın, iletişim ve ön kayıt sayfaları
 - Klavye erişimi, belirgin odak durumları ve hareket azaltma desteği
 - Cloudflare Pages için statik Next.js çıktısı; Workers ve OpenAI Sites için isteğe bağlı vinext çıktısı
 - Sunucu tarafında render edilen Türkçe SEO meta verileri
@@ -45,8 +45,11 @@ Laboratuvar ve program kartlarında kullanılan temsili stok fotoğraflar Pexels
 
 ## Proje yapısı
 
-- `app/page.tsx`: Sayfa içeriği ve semantik yapı
-- `app/globals.css`: Tasarım sistemi ve duyarlı düzen
+- `app/page.tsx`: Ana sayfa içeriği ve semantik yapı
+- `app/bolumler/`: Bölüm listesi ve statik oluşturulan program detayları
+- `app/components/SiteChrome.tsx`: İç sayfaların ortak header, footer ve sayfa kabuğu
+- `app/data/`: Program ve kadro için doğrulanmış, merkezi içerik verileri
+- `app/globals.css`, `app/homepage-redesign.css` ve `app/interior.css`: Ana ve iç sayfa tasarım sistemleri
 - `app/layout.tsx`: Türkçe meta veriler ve sayfa kabuğu
 - `public/images/`: Optimize edilmiş yerel görsel varlıklar
 - `tests/rendered-html.test.mjs`: Statik üretim çıktısı sözleşme testleri

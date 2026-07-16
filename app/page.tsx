@@ -1,8 +1,9 @@
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { DesktopNavigation } from "./components/DesktopNavigation";
 import { MobileNavigation } from "./components/MobileNavigation";
-import type { NavigationItem } from "./components/navigation";
+import { siteNavigation } from "./components/navigation";
 import { RegistrationForm } from "./components/RegistrationForm";
 import { ScrollAwareHeader } from "./components/ScrollAwareHeader";
 import {
@@ -41,6 +42,7 @@ type LinkItem = {
 
 type Department = {
   id: string;
+  slug: string;
   title: string;
   branch: string;
   description: string;
@@ -49,41 +51,10 @@ type Department = {
   accent: "teal" | "blue" | "green";
 };
 
-const navigation: NavigationItem[] = [
-  { label: "Anasayfa", href: "#anasayfa" },
-  {
-    label: "Bölümler",
-    children: [
-      { label: "Kimya", href: "#program-kimya" },
-      { label: "Elektrik - Elektronik", href: "#program-elektrik" },
-      { label: "Biyomedikal", href: "#program-biyomedikal" },
-    ],
-  },
-  {
-    label: "Okulumuz",
-    children: [
-      { label: "Okulumuz Hakkında", href: "/hakkimizda" },
-      { label: "Okul Kıyafetlerimiz", href: "https://samsun.dinamikokullari.com/okul-kiyafetlerimiz" },
-    ],
-  },
-  { label: "Kadromuz", href: "https://samsun.dinamikokullari.com/kadromuz" },
-  {
-    label: "Galeri",
-    children: [
-      {
-        label: "Sosyal - Kültürel - Sportif Çalışmalar",
-        href: "https://samsun.dinamikokullari.com/faaliyetlerimiz",
-      },
-      { label: "Dinamik Okul Bölümlerimiz", href: "#bolumler" },
-    ],
-  },
-  { label: "Başarılar", href: "https://samsun.dinamikokullari.com/basarilarimiz" },
-  { label: "İletişim", href: "#iletisim" },
-];
-
 const departments: Department[] = [
   {
     id: "kimya",
+    slug: "kimya-teknolojileri",
     title: "Kimya Teknolojileri",
     branch: "Kimya Laboratuvarı Dalı",
     description:
@@ -94,6 +65,7 @@ const departments: Department[] = [
   },
   {
     id: "elektrik",
+    slug: "elektrik-elektronik-teknolojileri",
     title: "Elektrik-Elektronik Teknolojileri",
     branch: "Elektrik Tesisatları ve Dağıtımı Dalı",
     description:
@@ -104,6 +76,7 @@ const departments: Department[] = [
   },
   {
     id: "biyomedikal",
+    slug: "biyomedikal-cihaz-teknolojileri",
     title: "Biyomedikal Cihaz Teknolojileri",
     branch: "Tıbbi Görüntüleme Sistemleri",
     description:
@@ -180,12 +153,12 @@ const gallery = [
 
 const quickLinks: LinkItem[] = [
   { label: "e-Okul Girişi", href: "https://e-okul.meb.gov.tr/", icon: School },
-  { label: "Bölümler", href: "#bolumler", icon: GraduationCap },
-  { label: "Rehberlik", href: "#ogrenci", icon: Users },
-  { label: "Etkinlikler", href: "#galeri", icon: CalendarDays },
-  { label: "Yemekhane", href: "#kampus", icon: Utensils },
-  { label: "Yayınlar", href: "#yayinlar", icon: BookOpen },
-  { label: "Bize Ulaşın", href: "#iletisim", icon: MessageCircle },
+  { label: "Bölümler", href: "/bolumler", icon: GraduationCap },
+  { label: "Rehberlik", href: "/rehberlik", icon: Users },
+  { label: "Etkinlikler", href: "/faaliyetlerimiz", icon: CalendarDays },
+  { label: "Kampüs", href: "/hakkimizda", icon: Utensils },
+  { label: "Yayınlar", href: "/haberler", icon: BookOpen },
+  { label: "Bize Ulaşın", href: "/iletisim", icon: MessageCircle },
 ];
 
 function InstagramIcon({ size = 16 }: { size?: number }) {
@@ -213,9 +186,9 @@ function Brand({ variant = "header" }: { variant?: "header" | "footer" }) {
   const isFooter = variant === "footer";
 
   return (
-    <a
+    <Link
       className={`brand brand--${variant}`}
-      href="#anasayfa"
+      href="/"
       aria-label="Dinamik Okulları anasayfa"
     >
       <Image
@@ -228,7 +201,7 @@ function Brand({ variant = "header" }: { variant?: "header" | "footer" }) {
         priority={!isFooter}
         unoptimized
       />
-    </a>
+    </Link>
   );
 }
 
@@ -256,9 +229,9 @@ function DepartmentCard({ department, index }: { department: Department; index: 
   const Icon = department.icon;
 
   return (
-    <a
+    <Link
       className={`department-card department-card--${department.accent}`}
-      href={`#program-${department.id}`}
+      href={`/bolumler/${department.slug}`}
     >
       <span className="department-number" aria-hidden="true">
         {String(index + 1).padStart(2, "0")}
@@ -281,7 +254,7 @@ function DepartmentCard({ department, index }: { department: Department; index: 
           Programı incele <ArrowRight size={15} aria-hidden="true" />
         </span>
       </span>
-    </a>
+    </Link>
   );
 }
 
@@ -296,12 +269,12 @@ export default function Home() {
         <div className="container header-inner">
           <Brand />
 
-          <DesktopNavigation navigation={navigation} />
+          <DesktopNavigation navigation={siteNavigation} />
 
           <div className="header-actions">
-            <a className="button button--header" href="#on-kayit">
+            <Link className="button button--header" href="/on-kayit">
               Ön Kayıt
-            </a>
+            </Link>
             <a
               className="button button--ghost-dark"
               href="https://e-okul.meb.gov.tr/"
@@ -313,7 +286,7 @@ export default function Home() {
             </a>
           </div>
 
-          <MobileNavigation navigation={navigation} />
+          <MobileNavigation navigation={siteNavigation} ctaHref="/on-kayit" />
         </div>
       </ScrollAwareHeader>
 
@@ -446,10 +419,10 @@ export default function Home() {
                   <DepartmentCard key={department.id} department={department} index={index} />
                 ))}
               </div>
-              <a className="departments-footer-link" href="#ogrenci">
+              <Link className="departments-footer-link" href="/bolumler">
                 Tüm bölümleri incele
                 <ArrowRight size={15} aria-hidden="true" />
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -492,15 +465,13 @@ export default function Home() {
                 <p className="eyebrow eyebrow--light">Dinamik&apos;ten</p>
                 <h2 id="news-title">Haberler &amp; Duyurular</h2>
               </div>
-              <a
+              <Link
                 className="button button--outline-light button--small"
-                href="https://samsun.dinamikokullari.com/yayinlarimiz"
-                target="_blank"
-                rel="noreferrer"
+                href="/haberler"
               >
                 Tüm Haberler
                 <ArrowRight size={15} aria-hidden="true" />
-              </a>
+              </Link>
             </div>
             <div className="news-grid">
               {publications.map((publication) => {
@@ -705,21 +676,21 @@ export default function Home() {
               </p>
             </div>
             <div className="guidance-cards">
-              <a href="https://samsun.dinamikokullari.com/rehberlik" target="_blank" rel="noreferrer">
+              <Link href="/rehberlik">
                 <ShieldCheck size={24} aria-hidden="true" />
                 <span><strong>Rehberlik</strong><small>Öğrencinin yanında, aileyle birlikte</small></span>
                 <ChevronRight size={17} aria-hidden="true" />
-              </a>
-              <a href="#bolumler">
+              </Link>
+              <Link href="/bolumler">
                 <Trophy size={24} aria-hidden="true" />
                 <span><strong>Kariyer Planlama</strong><small>İlgi ve yeteneğe uygun alan seçimi</small></span>
                 <ChevronRight size={17} aria-hidden="true" />
-              </a>
-              <a href="#galeri">
+              </Link>
+              <Link href="/faaliyetlerimiz">
                 <Users size={24} aria-hidden="true" />
                 <span><strong>Sosyal Yaşam</strong><small>Kültür, sanat, spor ve ekip ruhu</small></span>
                 <ChevronRight size={17} aria-hidden="true" />
-              </a>
+              </Link>
             </div>
           </div>
         </section>
@@ -820,16 +791,16 @@ export default function Home() {
           </div>
           <div className="footer-links">
             <strong>Keşfet</strong>
-            <a href="#okulumuz">Okulumuz</a>
-            <a href="#bolumler">Bölümler</a>
-            <a href="#ogrenci">Öğrenci</a>
-            <a href="#galeri">Galeri</a>
+            <Link href="/hakkimizda">Okulumuz</Link>
+            <Link href="/bolumler">Bölümler</Link>
+            <Link href="/rehberlik">Öğrenci</Link>
+            <Link href="/galeri">Galeri</Link>
           </div>
           <div className="footer-links">
             <strong>İletişim</strong>
             <a href="tel:+903624655353">0362 465 53 53</a>
             <a href="tel:+905467765060">0546 776 50 60</a>
-            <a href="#iletisim">İletişim Bilgileri</a>
+            <Link href="/iletisim">İletişim Bilgileri</Link>
           </div>
           <div className="footer-social">
             <strong>Bizi Takip Edin</strong>

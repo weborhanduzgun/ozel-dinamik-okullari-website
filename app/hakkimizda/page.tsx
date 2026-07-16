@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { DesktopNavigation } from "../components/DesktopNavigation";
 import { MobileNavigation } from "../components/MobileNavigation";
-import type { NavigationItem } from "../components/navigation";
+import { siteNavigation } from "../components/navigation";
 import { ScrollAwareHeader } from "../components/ScrollAwareHeader";
 import "./hakkimizda.css";
 
@@ -32,32 +32,6 @@ export const metadata: Metadata = {
     "Dinamik Mesleki ve Teknik Anadolu Lisesi'nin eğitim yaklaşımı, vizyonu, misyonu ve kalite politikası.",
   alternates: { canonical: "/hakkimizda" },
 };
-
-const navigation: NavigationItem[] = [
-  { label: "Anasayfa", href: "/" },
-  {
-    label: "Bölümler",
-    children: [
-      { label: "Kimya", href: "/#program-kimya" },
-      { label: "Elektrik - Elektronik", href: "/#program-elektrik" },
-      { label: "Biyomedikal", href: "/#program-biyomedikal" },
-    ],
-  },
-  {
-    label: "Okulumuz",
-    children: [
-      { label: "Okulumuz Hakkında", href: "/hakkimizda" },
-      {
-        label: "Okul Kıyafetlerimiz",
-        href: "https://samsun.dinamikokullari.com/okul-kiyafetlerimiz",
-      },
-    ],
-  },
-  { label: "Kadromuz", href: "https://samsun.dinamikokullari.com/kadromuz" },
-  { label: "Galeri", href: "/#galeri" },
-  { label: "Başarılar", href: "https://samsun.dinamikokullari.com/basarilarimiz" },
-  { label: "İletişim", href: "/#iletisim" },
-];
 
 const facts = [
   { value: "4 Yıl", label: "Ücretsiz eğitim", icon: GraduationCap },
@@ -71,19 +45,19 @@ const activeFields = [
     title: "Kimya Teknolojileri",
     branch: "Kimya Laboratuvarı Dalı",
     icon: FlaskConical,
-    href: "/#program-kimya",
+    href: "/bolumler/kimya-teknolojileri",
   },
   {
     title: "Elektrik-Elektronik",
     branch: "Elektrik Tesisatları ve Dağıtımı Dalı",
     icon: CircuitBoard,
-    href: "/#program-elektrik",
+    href: "/bolumler/elektrik-elektronik-teknolojileri",
   },
   {
     title: "Biyomedikal Cihaz",
     branch: "Tıbbi Görüntüleme Sistemleri Dalı",
     icon: HeartPulse,
-    href: "/#program-biyomedikal",
+    href: "/bolumler/biyomedikal-cihaz-teknolojileri",
   },
 ];
 
@@ -147,11 +121,11 @@ export default function AboutPage() {
               unoptimized
             />
           </Link>
-          <DesktopNavigation navigation={navigation} />
+          <DesktopNavigation navigation={siteNavigation} />
           <div className="header-actions">
-            <Link className="button button--header" href="/#on-kayit">Ön Kayıt</Link>
+            <Link className="button button--header" href="/on-kayit">Ön Kayıt</Link>
           </div>
-          <MobileNavigation navigation={navigation} ctaHref="/#on-kayit" />
+          <MobileNavigation navigation={siteNavigation} ctaHref="/on-kayit" />
         </div>
       </ScrollAwareHeader>
 
@@ -185,7 +159,7 @@ export default function AboutPage() {
                 <Link className="button button--primary" href="#egitim-yaklasimimiz">
                   Eğitim yaklaşımımız <ArrowRight size={16} aria-hidden="true" />
                 </Link>
-                <Link className="button about-button-outline" href="/#bolumler">
+                <Link className="button about-button-outline" href="/bolumler">
                   Bölümlerimizi keşfedin
                 </Link>
               </div>
@@ -392,10 +366,10 @@ export default function AboutPage() {
                 yerinizi bugünden planlayın.
               </p>
               <div className="about-cta-actions">
-                <Link className="button button--primary" href="/#on-kayit">
+                <Link className="button button--primary" href="/on-kayit">
                   Ön kayıt başvurusu <ArrowRight size={16} aria-hidden="true" />
                 </Link>
-                <Link className="button about-button-light" href="/#iletisim">Bize ulaşın</Link>
+                <Link className="button about-button-light" href="/iletisim">Bize ulaşın</Link>
               </div>
             </div>
             <div className="about-cta-visual">
@@ -432,16 +406,16 @@ export default function AboutPage() {
           <div className="about-footer-links">
             <strong>Okulumuz</strong>
             <Link href="/hakkimizda">Hakkımızda</Link>
-            <Link href="/#bolumler">Bölümlerimiz</Link>
-            <Link href="/#galeri">Galeri</Link>
-            <Link href="/#on-kayit">Ön Kayıt</Link>
+            <Link href="/bolumler">Bölümlerimiz</Link>
+            <Link href="/galeri">Galeri</Link>
+            <Link href="/on-kayit">Ön Kayıt</Link>
           </div>
           <div className="about-footer-links">
             <strong>Öğrenci</strong>
             <a href="https://e-okul.meb.gov.tr/" target="_blank" rel="noreferrer">e-Okul</a>
-            <Link href="/#ogrenci">Rehberlik</Link>
-            <Link href="/#yayinlar">Yayınlar</Link>
-            <Link href="/#kampus">Kampüs</Link>
+            <Link href="/rehberlik">Rehberlik</Link>
+            <Link href="/haberler">Yayınlar</Link>
+            <Link href="/hakkimizda">Kampüs</Link>
           </div>
           <div className="about-footer-contact">
             <strong>İletişim</strong>

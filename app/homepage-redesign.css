@@ -1152,12 +1152,16 @@ main > section[id] {
   }
 
   .mobile-menu nav {
+    max-height: calc(100dvh - 90px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     border-color: rgba(255, 255, 255, 0.1);
     background: var(--home-ink-soft);
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
   }
 
   .mobile-menu nav > a,
+  .mobile-navigation-parent,
   .mobile-submenu-trigger {
     border-color: rgba(255, 255, 255, 0.08);
     color: #fff;

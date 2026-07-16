@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./homepage-redesign.css";
+import "./interior.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://samsun.dinamikokullari.com"),
@@ -55,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr">
+    <html lang="tr" data-scroll-behavior="smooth">
       <body>{children}</body>
     </html>
   );
