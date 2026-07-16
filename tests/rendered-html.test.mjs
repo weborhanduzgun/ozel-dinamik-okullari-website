@@ -51,6 +51,20 @@ test("keeps essential navigation and accessibility contracts", async () => {
   assert.match(html, /aria-expanded="false"/i);
 });
 
+test("renders the cinematic homepage composition while preserving the brand logos", async () => {
+  const response = await render();
+  const html = await response.text();
+
+  assert.match(html, /src="\/images\/dinamik-logo-retina\.png"/i);
+  assert.match(html, /src="\/images\/footer-logo-dinamik\.png"/i);
+  assert.match(html, /class="hero"/i);
+  assert.doesNotMatch(html, /class="stats-section"/i);
+  assert.match(html, /id="news-title"[^>]*>Haberler &amp; Duyurular</i);
+  assert.match(html, /class="departments-footer-link"/i);
+  assert.match(html, /class="hero-rail"/i);
+  assert.equal((html.match(/class="hero-tile(?: hero-tile--large)?"/gi) ?? []).length, 3);
+});
+
 test("removes disposable starter preview code and dependency", async () => {
   const packageJson = await readFile(new URL("../package.json", import.meta.url), "utf8");
 

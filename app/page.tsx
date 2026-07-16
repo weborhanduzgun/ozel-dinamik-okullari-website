@@ -4,6 +4,7 @@ import { DesktopNavigation } from "./components/DesktopNavigation";
 import { MobileNavigation } from "./components/MobileNavigation";
 import type { NavigationItem } from "./components/navigation";
 import { RegistrationForm } from "./components/RegistrationForm";
+import { ScrollAwareHeader } from "./components/ScrollAwareHeader";
 import {
   ArrowRight,
   BookOpen,
@@ -17,10 +18,8 @@ import {
   FlaskConical,
   GraduationCap,
   HeartPulse,
-  Library,
   MapPin,
   MessageCircle,
-  Microscope,
   Phone,
   Play,
   School,
@@ -30,7 +29,6 @@ import {
   Users,
   Utensils,
   Video,
-  Volleyball,
   Wrench,
   Zap,
 } from "lucide-react";
@@ -64,7 +62,7 @@ const navigation: NavigationItem[] = [
   {
     label: "Okulumuz",
     children: [
-      { label: "Okulumuz Hakkında", href: "https://samsun.dinamikokullari.com/hakkimizda" },
+      { label: "Okulumuz Hakkında", href: "/hakkimizda" },
       { label: "Okul Kıyafetlerimiz", href: "https://samsun.dinamikokullari.com/okul-kiyafetlerimiz" },
     ],
   },
@@ -110,7 +108,7 @@ const departments: Department[] = [
     branch: "Tıbbi Görüntüleme Sistemleri",
     description:
       "Tıbbi cihazların kurulumu, kullanımı, bakım süreçleri ve sağlık teknolojilerinin teknik altyapısına yönelik eğitim.",
-    image: "/images/hero-lab.jpg",
+    image: "/images/biomedical.jpg",
     icon: HeartPulse,
     accent: "green",
   },
@@ -119,23 +117,28 @@ const departments: Department[] = [
 const benefits = [
   {
     icon: GraduationCap,
-    title: "4 Yıl Ücretsiz Eğitim",
-    text: "Özel okul deneyimi, eğitim ücreti olmadan.",
+    title: "4 Yıl",
+    text: "Ücretsiz Eğitim",
   },
   {
     icon: Wrench,
-    title: "Uygulamalı Öğrenme",
-    text: "Teori; atölye, laboratuvar ve saha ile birleşir.",
+    title: "3 Alan",
+    text: "Mesleki Program",
   },
   {
     icon: Building2,
-    title: "Sanayi ile Birlikte",
-    text: "Mesleki gelişim iş dünyası uygulamalarıyla desteklenir.",
+    title: "1.400",
+    text: "Öğrenci Kapasitesi",
   },
   {
     icon: School,
-    title: "Güçlü Kampüs",
-    text: "Laboratuvar, spor, kütüphane ve sosyal alanlar.",
+    title: "400",
+    text: "Kişilik Konferans Salonu",
+  },
+  {
+    icon: Trophy,
+    title: "1 Kampüs",
+    text: "Eğitim, Spor ve Sosyal Yaşam",
   },
 ];
 
@@ -145,6 +148,7 @@ const publications = [
     title: "Bilim, Kültür ve Sanat Dergilerimiz",
     description: "Öğrencilerin bilimsel, kültürel ve sanatsal üretimleri.",
     icon: BookOpen,
+    image: "/images/gallery-7.jpg",
     href: "https://samsun.dinamikokullari.com/mayis-haziran-ayi-bilim-kultur-ve-sanat-dergimiz",
   },
   {
@@ -152,6 +156,7 @@ const publications = [
     title: "Dijital Kimliğimle Varım",
     description: "eTwinning ortaklığıyla güvenli ve bilinçli dijital yaşam.",
     icon: Sparkles,
+    image: "/images/gallery-8.jpg",
     href: "https://samsun.dinamikokullari.com/dijital-kimligimle-varim-projesinde-e-twinnig-proje-ortagiyiz-2",
   },
   {
@@ -159,6 +164,7 @@ const publications = [
     title: "Mesleki Gelişim İçerikleri",
     description: "Kariyer, sınav ve ergenlik dönemine yönelik rehberlik.",
     icon: Users,
+    image: "/images/gallery-3.jpg",
     href: "https://samsun.dinamikokullari.com/rehberlik-mesleki-gelisim-dergisi",
   },
 ];
@@ -246,7 +252,7 @@ function SectionHeading({
   );
 }
 
-function DepartmentCard({ department }: { department: Department }) {
+function DepartmentCard({ department, index }: { department: Department; index: number }) {
   const Icon = department.icon;
 
   return (
@@ -254,6 +260,9 @@ function DepartmentCard({ department }: { department: Department }) {
       className={`department-card department-card--${department.accent}`}
       href={`#program-${department.id}`}
     >
+      <span className="department-number" aria-hidden="true">
+        {String(index + 1).padStart(2, "0")}
+      </span>
       <Image
         src={department.image}
         alt=""
@@ -283,7 +292,7 @@ export default function Home() {
         İçeriğe geç
       </a>
 
-      <header className="site-header">
+      <ScrollAwareHeader>
         <div className="container header-inner">
           <Brand />
 
@@ -306,7 +315,7 @@ export default function Home() {
 
           <MobileNavigation navigation={navigation} />
         </div>
-      </header>
+      </ScrollAwareHeader>
 
       <main id="main-content">
         <section className="hero" id="anasayfa" aria-labelledby="hero-title">
@@ -316,100 +325,89 @@ export default function Home() {
           <div className="hero-wash" aria-hidden="true" />
 
           <div className="container hero-layout">
-            <div className="hero-copy">
-              <p className="hero-eyebrow">
-                <span aria-hidden="true" />
-                Senin mesleğin, senin geleceğin
-              </p>
-              <h1 id="hero-title">
-                Geleceğin <em>Teknolojisini</em> Bugünden Öğren.
-              </h1>
-              <p className="hero-lead">
-                Mesleki bilgiyi gerçek uygulamalarla buluşturan, dört yıl ücretsiz ve
-                güçlü bir lise deneyimi.
-              </p>
+            <div className="hero-stage">
+              <div className="hero-copy">
+                <p className="hero-eyebrow">
+                  <span aria-hidden="true" />
+                  Senin mesleğin, senin geleceğin
+                </p>
+                <h1 id="hero-title">
+                  Geleceğin <em>Teknolojisini</em> Bugünden Öğren.
+                </h1>
+                <p className="hero-lead">
+                  Mesleki bilgiyi gerçek uygulamalarla buluşturan, dört yıl ücretsiz ve
+                  güçlü bir lise deneyimi.
+                </p>
 
-              <div className="hero-actions">
-                <a className="button button--primary" href="#bolumler">
-                  Bölümleri İncele
-                  <ArrowRight size={17} aria-hidden="true" />
-                </a>
-                <a className="button button--secondary" href="#okulumuz">
-                  Okulumuzu Tanıyın
-                </a>
+                <div className="hero-actions">
+                  <a className="button button--primary" href="#bolumler">
+                    Bölümleri İncele
+                    <ArrowRight size={17} aria-hidden="true" />
+                  </a>
+                  <a className="button button--secondary" href="#okulumuz">
+                    <Play size={16} fill="currentColor" aria-hidden="true" />
+                    Okulumuzu Tanıyın
+                  </a>
+                </div>
               </div>
 
-              <div className="proof-grid" aria-label="Okulun öne çıkan bilgileri">
-                <div className="proof-card">
-                  <span className="proof-icon proof-icon--teal" aria-hidden="true">
-                    <GraduationCap size={21} />
+              <aside className="hero-rail" aria-label="Okuldan öne çıkanlar">
+                <a
+                  className="hero-tile hero-tile--large"
+                  href="https://www.youtube.com/channel/UCmwV6um8k2UhRbSzQEhyM6g"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Image
+                    src="/images/gallery-4.jpg"
+                    alt="Dinamik Okulları tanıtımı"
+                    fill
+                    sizes="184px"
+                  />
+                  <span className="play-button" aria-hidden="true">
+                    <Play size={17} fill="currentColor" />
                   </span>
-                  <span>
-                    <strong>4 Yıl</strong>
-                    <small>Ücretsiz Eğitim</small>
-                  </span>
-                </div>
-                <div className="proof-card">
-                  <span className="proof-icon proof-icon--blue" aria-hidden="true">
-                    <Microscope size={21} />
-                  </span>
-                  <span>
-                    <strong>3 Alan</strong>
-                    <small>Mesleki Program</small>
-                  </span>
-                </div>
-                <div className="proof-card">
-                  <span className="proof-icon proof-icon--green" aria-hidden="true">
-                    <Users size={21} />
-                  </span>
-                  <span>
-                    <strong>1.400</strong>
-                    <small>Öğrenci Kapasitesi</small>
-                  </span>
-                </div>
-              </div>
+                  <strong>Okulumuzu Tanıyın</strong>
+                </a>
+                <a className="hero-tile" href="#bolumler">
+                  <Image
+                    src="/images/electronics.jpg"
+                    alt="Uygulamalı eğitim çalışması"
+                    fill
+                    sizes="184px"
+                  />
+                  <strong>Uygulamalı Eğitim</strong>
+                </a>
+                <a className="hero-tile" href="#galeri">
+                  <Image
+                    src="/images/gallery-7.jpg"
+                    alt="Dinamik öğrenci etkinliği"
+                    fill
+                    sizes="184px"
+                  />
+                  <strong>Dinamik&apos;te Yaşam</strong>
+                </a>
+              </aside>
             </div>
 
-            <aside className="hero-rail" aria-label="Okuldan öne çıkanlar">
-              <a
-                className="hero-tile hero-tile--large"
-                href="https://www.youtube.com/channel/UCmwV6um8k2UhRbSzQEhyM6g"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Image
-                  src="/images/gallery-4.jpg"
-                  alt="Dinamik Okulları tanıtımı"
-                  fill
-                  loading="lazy"
-                  sizes="184px"
-                />
-                <span className="play-button" aria-hidden="true">
-                  <Play size={17} fill="currentColor" />
-                </span>
-                <strong>Okulumuzu Tanıyın</strong>
-              </a>
-              <a className="hero-tile" href="#bolumler">
-                <Image
-                  src="/images/electronics.jpg"
-                  alt="Uygulamalı eğitim çalışması"
-                  fill
-                  loading="lazy"
-                  sizes="184px"
-                />
-                <strong>Uygulamalı Eğitim</strong>
-              </a>
-              <a className="hero-tile" href="#galeri">
-                <Image
-                  src="/images/gallery-7.jpg"
-                  alt="Dinamik öğrenci etkinliği"
-                  fill
-                  loading="lazy"
-                  sizes="184px"
-                />
-                <strong>Dinamik&apos;te Yaşam</strong>
-              </a>
-            </aside>
+            <div className="proof-grid" aria-label="Okulun öne çıkan bilgileri">
+              {benefits.map((benefit, index) => {
+                const Icon = benefit.icon;
+                const accent = ["teal", "blue", "green", "blue", "teal"][index];
+
+                return (
+                  <div className="proof-card" key={benefit.title}>
+                    <span className={`proof-icon proof-icon--${accent}`} aria-hidden="true">
+                      <Icon size={20} />
+                    </span>
+                    <span>
+                      <strong>{benefit.title}</strong>
+                      <small>{benefit.text}</small>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 
@@ -444,61 +442,24 @@ export default function Home() {
                 description="Her program, güvenli çalışma kültürü ile teorik bilgiyi uygulamalı eğitimde buluşturur."
               />
               <div className="department-grid">
-                {departments.map((department) => (
-                  <DepartmentCard key={department.id} department={department} />
+                {departments.map((department, index) => (
+                  <DepartmentCard key={department.id} department={department} index={index} />
                 ))}
               </div>
-            </div>
-
-            <aside className="publication-panel" id="yayinlar" aria-labelledby="publications-title">
-              <div className="publication-header">
-                <span>
-                  <small>Dinamik&apos;ten</small>
-                  <strong id="publications-title">Yayınlar &amp; Projeler</strong>
-                </span>
-                <BookOpen size={22} aria-hidden="true" />
-              </div>
-              <div className="publication-list">
-                {publications.map((publication) => {
-                  const Icon = publication.icon;
-                  return (
-                    <a
-                      key={publication.title}
-                      href={publication.href}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <span className="publication-icon" aria-hidden="true">
-                        <Icon size={19} />
-                      </span>
-                      <span>
-                        <small>{publication.type}</small>
-                        <strong>{publication.title}</strong>
-                        <em>{publication.description}</em>
-                      </span>
-                      <ChevronRight size={16} aria-hidden="true" />
-                    </a>
-                  );
-                })}
-              </div>
-              <a
-                className="panel-link"
-                href="https://samsun.dinamikokullari.com/yayinlarimiz"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Tüm yayınları görüntüle
+              <a className="departments-footer-link" href="#ogrenci">
+                Tüm bölümleri incele
                 <ArrowRight size={15} aria-hidden="true" />
               </a>
-            </aside>
+            </div>
           </div>
         </section>
 
         <section className="gallery-section" id="galeri" aria-labelledby="gallery-title">
           <div className="container gallery-layout">
             <div className="gallery-intro">
-              <p className="eyebrow">Dinamik&apos;te Yaşam</p>
-              <h2 id="gallery-title">Okul sadece sınıftan ibaret değil.</h2>
+              <p className="eyebrow">Kampüs &amp; Yaşam</p>
+              <h2 id="gallery-title">Dinamik&apos;te Yaşam</h2>
+              <p className="gallery-description">Eğitim sadece sınıfta değil, hayatın her anında.</p>
               <a
                 className="button button--secondary button--small"
                 href="https://www.instagram.com/dinamikokullarisamsun"
@@ -524,12 +485,68 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="news-section" id="yayinlar" aria-labelledby="news-title">
+          <div className="container">
+            <div className="news-heading">
+              <div>
+                <p className="eyebrow eyebrow--light">Dinamik&apos;ten</p>
+                <h2 id="news-title">Haberler &amp; Duyurular</h2>
+              </div>
+              <a
+                className="button button--outline-light button--small"
+                href="https://samsun.dinamikokullari.com/yayinlarimiz"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Tüm Haberler
+                <ArrowRight size={15} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="news-grid">
+              {publications.map((publication) => {
+                const Icon = publication.icon;
+
+                return (
+                  <a
+                    className="news-card"
+                    href={publication.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    key={publication.title}
+                  >
+                    <span className="news-media">
+                      <Image
+                        src={publication.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 700px) calc(100vw - 32px), 30vw"
+                      />
+                    </span>
+                    <span className="news-content">
+                      <span className="news-meta">
+                        <Icon size={15} aria-hidden="true" />
+                        {publication.type}
+                      </span>
+                      <strong>{publication.title}</strong>
+                      <small>{publication.description}</small>
+                      <span className="news-link">
+                        Haberi incele
+                        <ArrowRight size={14} aria-hidden="true" />
+                      </span>
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         <section className="campus-section" id="okulumuz" aria-labelledby="campus-title">
           <div className="container campus-grid">
             <div className="campus-media">
               <Image
-                src="/images/gallery-4.jpg"
-                alt="Dinamik öğrencilerinin sosyal etkinliği"
+                src="/images/gallery-8.jpg"
+                alt="Dinamik öğrencileri okul etkinliğinde"
                 fill
                 sizes="(max-width: 800px) calc(100vw - 32px), 50vw"
               />
@@ -543,44 +560,51 @@ export default function Home() {
               </div>
             </div>
             <div className="campus-copy">
-              <p className="eyebrow eyebrow--light">Okulumuz</p>
-              <h2 id="campus-title">Öğrenmek, üretmek ve birlikte gelişmek için tasarlandı.</h2>
+              <p className="eyebrow">Neden Dinamik?</p>
+              <h2 id="campus-title">Geleceği yalnızca anlatmıyor, öğrencilerimizle birlikte inşa ediyoruz.</h2>
               <p>
-                Dinamik Mesleki ve Teknik Anadolu Lisesi; mesleki uygulama alanlarını,
-                akademik gelişimi ve sosyal yaşamı aynı kampüste buluşturur.
+                Modern teknik altyapıyı, uygulamalı eğitimi ve iş dünyasıyla kurulan güçlü
+                bağları öğrencilerimizin geleceğine dönüştürüyoruz.
               </p>
               <div className="campus-features" id="kampus">
                 <div>
                   <FlaskConical size={21} aria-hidden="true" />
                   <span>
-                    <strong>Atölye &amp; Laboratuvarlar</strong>
-                    <small>Üç mesleki alanı destekleyen uygulama ortamları</small>
+                    <strong>Modern ve Yüksek Teknolojili Atölyeler</strong>
+                    <small>Her alan için güncel teknik altyapı ve uygulama ortamları</small>
                   </span>
                 </div>
                 <div>
-                  <Library size={21} aria-hidden="true" />
+                  <Building2 size={21} aria-hidden="true" />
                   <span>
-                    <strong>Kütüphane &amp; Okuma Salonu</strong>
-                    <small>Odaklanma ve araştırma için sakin çalışma alanları</small>
+                    <strong>Sanayi ile Güçlü İş Birlikleri</strong>
+                    <small>Gerçek projeler, staj olanakları ve istihdam fırsatları</small>
                   </span>
                 </div>
                 <div>
-                  <Volleyball size={21} aria-hidden="true" />
+                  <Wrench size={21} aria-hidden="true" />
                   <span>
-                    <strong>Spor Alanları</strong>
-                    <small>Kapalı salon ile açık futbol, basketbol ve voleybol sahaları</small>
+                    <strong>Uygulamalı Eğitim Ağırlıklı Müfredat</strong>
+                    <small>Teori ve pratiği birleştiren çağdaş eğitim modeli</small>
                   </span>
                 </div>
                 <div>
-                  <Utensils size={21} aria-hidden="true" />
+                  <GraduationCap size={21} aria-hidden="true" />
                   <span>
-                    <strong>Yaşam Alanları</strong>
-                    <small>Kafeterya, yemekhane ve çok amaçlı sosyal alanlar</small>
+                    <strong>Üniversite ve Doğrudan İşe Geçiş</strong>
+                    <small>İstediğin yolda güçlü bir gelecek için rehberlik</small>
+                  </span>
+                </div>
+                <div>
+                  <ShieldCheck size={21} aria-hidden="true" />
+                  <span>
+                    <strong>Güvenli ve Sosyal Kampüs</strong>
+                    <small>Spor, kültür, sanat ve birlikte üretme kültürü</small>
                   </span>
                 </div>
               </div>
               <a className="button button--light" href="#iletisim">
-                Kampüsü Ziyaret Edin
+                Okulumuzu Keşfedin
                 <ArrowRight size={17} aria-hidden="true" />
               </a>
             </div>

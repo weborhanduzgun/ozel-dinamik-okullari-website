@@ -34,6 +34,11 @@ Cloudflare Pages üretim derlemesi `npm run build:vercel` komutunu ve `out` çı
 
 ## İçerik kaynakları
 
+Kullanıcı tarafından sağlanan kalıcı tasarım, logo ve bölüm/dal kaynakları
+[`references/README.md`](references/README.md) dosyasında listelenmiştir. Tasarım veya
+kurumsal içerik değişikliklerinden önce bu kaynaklar ve kök dizindeki `AGENTS.md`
+kontrol edilmelidir.
+
 Kurumsal bilgiler okulun mevcut web sitesindeki `Hakkımızda` ve `Bize Ulaşın` sayfaları ile proje için sağlanan bölüm tanıtım metninden derlenmiştir. Dinamik başarı, takipçi veya kampanya rakamları sabit içerik olarak kullanılmamıştır.
 
 Laboratuvar ve program kartlarında kullanılan temsili stok fotoğraflar Pexels üzerindeki [8926659](https://www.pexels.com/photo/people-wearing-protective-goggles-8926659/), [17894335](https://www.pexels.com/photo/student-in-goggles-sitting-by-table-in-classroom-17894335/) ve [6208709](https://www.pexels.com/photo/students-inside-a-science-laboratory-6208709/) numaralı ücretsiz görsellerdir. Galeri görselleri okulun mevcut sitesindeki faaliyet arşivinden alınmıştır; canlıya geçmeden önce öğrenci görsellerinin kullanım izinleri okul yönetimi tarafından doğrulanmalıdır.
