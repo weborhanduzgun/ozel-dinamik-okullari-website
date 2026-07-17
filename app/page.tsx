@@ -4,7 +4,7 @@ import Link from "next/link";
 import { InstagramIcon, SiteFooter, SiteHeader } from "./components/SiteChrome";
 import { RegistrationForm } from "./components/RegistrationForm";
 import { getDepartments } from "./data/departments";
-import { getGalleryImages, getSiteSettings } from "../lib/content";
+import { getGalleryImages, getHomepageSections, getSiteSettings, type HomepageSection } from "../lib/content";
 import {
   ArrowRight,
   Building2,
@@ -163,24 +163,90 @@ function DepartmentCard({ department, index }: { department: Department; index: 
   );
 }
 
+function managedThemeClass(section: HomepageSection | undefined): string {
+  return section && section.theme !== "original" ? ` homepage-theme-${section.theme}` : "";
+}
+
+function HeroTitle({ title }: { title: string }) {
+  const highlightedWord = "Teknolojisini";
+  const highlightIndex = title.indexOf(highlightedWord);
+  if (highlightIndex < 0) return title;
+  return (
+    <>
+      {title.slice(0, highlightIndex)}
+      <em>{highlightedWord}</em>
+      {title.slice(highlightIndex + highlightedWord.length)}
+    </>
+  );
+}
+
+function CustomHomepageSection({ section }: { section: HomepageSection }) {
+  const hasLink = Boolean(section.ctaLabel && section.ctaHref);
+  const className = `custom-home-section custom-home-section--${section.sectionType.replace("custom-", "")}${managedThemeClass(section)}`;
+
+  return (
+    <section className={className} aria-labelledby={`custom-section-${section.id}`}>
+      <div className="container custom-home-section-inner">
+        <div className="custom-home-section-copy">
+          {section.eyebrow ? <p className="eyebrow">{section.eyebrow}</p> : null}
+          <h2 id={`custom-section-${section.id}`}>{section.title}</h2>
+          {section.description ? <p>{section.description}</p> : null}
+        </div>
+        {hasLink ? (
+          <a className="button button--primary" href={section.ctaHref}>
+            {section.ctaLabel}
+            <ArrowRight size={17} aria-hidden="true" />
+          </a>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
 export default async function Home() {
-  const [canonicalDepartments, galleryImages, settings] = await Promise.all([
+  const [canonicalDepartments, galleryImages, settings, homepageSections] = await Promise.all([
     getDepartments(),
     getGalleryImages(),
     getSiteSettings(),
+    getHomepageSections(),
   ]);
-  const departments: Department[] = canonicalDepartments
-    .filter((department) => department.slug in departmentTeasers)
-    .map((department) => ({
-      ...departmentTeasers[department.slug],
+  const departmentAccentMap = {
+    red: { accent: "teal", icon: FlaskConical },
+    indigo: { accent: "blue", icon: CircuitBoard },
+    cyan: { accent: "green", icon: HeartPulse },
+  } as const;
+  const departments: Department[] = canonicalDepartments.map((department) => {
+    const teaser = departmentTeasers[department.slug];
+    const theme = departmentAccentMap[department.accent] ?? departmentAccentMap.indigo;
+    return {
+      slug: department.slug,
       title: department.title,
       branch: department.branch,
       image: department.image,
-    }));
+      description: teaser?.description ?? department.lead,
+      icon: teaser?.icon ?? theme.icon,
+      accent: teaser?.accent ?? theme.accent,
+    };
+  });
   const gallery = galleryImages.slice(0, 6);
   const generalPhoneTel = `tel:+9${settings.generalPhone.replace(/\D/g, "")}`;
   const landlineTel = `tel:+9${settings.landlinePhone.replace(/\D/g, "")}`;
   const whatsappHref = `https://wa.me/9${settings.whatsapp.replace(/\D/g, "")}`;
+  const sectionByKey = new Map(homepageSections.map((section) => [section.sectionKey, section]));
+  const heroSection = sectionByKey.get("hero");
+  const benefitsSection = sectionByKey.get("benefits");
+  const departmentsSection = sectionByKey.get("departments");
+  const gallerySection = sectionByKey.get("gallery");
+  const campusSection = sectionByKey.get("campus");
+  const programsSection = sectionByKey.get("programs");
+  const guidanceSection = sectionByKey.get("guidance");
+  const registrationSection = sectionByKey.get("registration");
+  const contactSection = sectionByKey.get("contact");
+  const customSections = homepageSections.filter((section) => section.isDeletable && section.isVisible);
+  const defaultDepartmentsTitle = "Teknolojiyi mesleğe dönüştüren üç alan";
+  const managedDepartmentsTitle = departmentsSection?.title === defaultDepartmentsTitle && departments.length !== 3
+    ? `Teknolojiyi mesleğe dönüştüren ${departments.length} mesleki alan`
+    : departmentsSection?.title ?? defaultDepartmentsTitle;
 
   return (
     <div className="site-shell">
@@ -191,7 +257,8 @@ export default async function Home() {
       <SiteHeader />
 
       <main id="main-content">
-        <section className="hero" id="anasayfa" aria-labelledby="hero-title">
+        {heroSection?.isVisible !== false ? (
+        <section className={`hero${managedThemeClass(heroSection)}`} id="anasayfa" aria-labelledby="hero-title">
           <div className="hero-media" aria-hidden="true">
             <Image src="/images/hero-banner.png" alt="" fill priority sizes="100vw" />
           </div>
@@ -202,19 +269,18 @@ export default async function Home() {
               <div className="hero-copy">
                 <p className="hero-eyebrow">
                   <span aria-hidden="true" />
-                  Senin mesleğin, senin geleceğin
+                  {heroSection?.eyebrow ?? "Senin mesleğin, senin geleceğin"}
                 </p>
                 <h1 id="hero-title">
-                  Geleceğin <em>Teknolojisini</em> Bugünden Öğren.
+                  <HeroTitle title={heroSection?.title ?? "Geleceğin Teknolojisini Bugünden Öğren."} />
                 </h1>
                 <p className="hero-lead">
-                  Mesleki bilgiyi gerçek uygulamalarla buluşturan, dört yıl ücretsiz ve
-                  güçlü bir lise deneyimi.
+                  {heroSection?.description ?? "Mesleki bilgiyi gerçek uygulamalarla buluşturan, dört yıl ücretsiz ve güçlü bir lise deneyimi."}
                 </p>
 
                 <div className="hero-actions">
-                  <a className="button button--primary" href="#bolumler">
-                    Bölümleri İncele
+                  <a className="button button--primary" href={heroSection?.ctaHref ?? "#bolumler"}>
+                    {heroSection?.ctaLabel ?? "Bölümleri İncele"}
                     <ArrowRight size={17} aria-hidden="true" />
                   </a>
                   <a className="button button--secondary" href="#okulumuz">
@@ -283,11 +349,13 @@ export default async function Home() {
             </div>
           </div>
         </section>
+        ) : null}
 
-        <section className="benefit-strip" aria-labelledby="benefit-title">
+        {benefitsSection?.isVisible !== false ? (
+        <section className={`benefit-strip${managedThemeClass(benefitsSection)}`} aria-labelledby="benefit-title">
           <div className="container benefit-grid">
             <div className="benefit-label">
-              <strong id="benefit-title">Neden Dinamik?</strong>
+              <strong id="benefit-title">{benefitsSection?.title ?? "Neden Dinamik?"}</strong>
               <span aria-hidden="true" />
             </div>
             {benefits.map((benefit) => {
@@ -304,35 +372,39 @@ export default async function Home() {
             })}
           </div>
         </section>
+        ) : null}
 
-        <section className="department-news-section" id="bolumler" aria-labelledby="departments-title">
+        {departmentsSection?.isVisible !== false ? (
+        <section className={`department-news-section${managedThemeClass(departmentsSection)}`} id="bolumler" aria-labelledby="departments-title">
           <div className="container department-news-grid">
             <div className="departments-block">
               <SectionHeading
                 id="departments-title"
-                eyebrow="Bölümlerimiz"
-                title="Teknolojiyi mesleğe dönüştüren üç alan"
-                description="Her program, güvenli çalışma kültürü ile teorik bilgiyi uygulamalı eğitimde buluşturur."
+                eyebrow={departmentsSection?.eyebrow ?? "Bölümlerimiz"}
+                title={managedDepartmentsTitle}
+                description={departmentsSection?.description ?? "Her program, güvenli çalışma kültürü ile teorik bilgiyi uygulamalı eğitimde buluşturur."}
               />
               <div className="department-grid">
                 {departments.map((department, index) => (
                   <DepartmentCard key={department.slug} department={department} index={index} />
                 ))}
               </div>
-              <Link className="departments-footer-link" href="/bolumler">
-                Tüm bölümleri incele
+              <Link className="departments-footer-link" href={departmentsSection?.ctaHref ?? "/bolumler"}>
+                {departmentsSection?.ctaLabel ?? "Tüm bölümleri incele"}
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
             </div>
           </div>
         </section>
+        ) : null}
 
-        <section className="gallery-section" id="galeri" aria-labelledby="gallery-title">
+        {gallerySection?.isVisible !== false ? (
+        <section className={`gallery-section${managedThemeClass(gallerySection)}`} id="galeri" aria-labelledby="gallery-title">
           <div className="container gallery-layout">
             <div className="gallery-intro">
-              <p className="eyebrow">Kampüs &amp; Yaşam</p>
-              <h2 id="gallery-title">Dinamik&apos;te Yaşam</h2>
-              <p className="gallery-description">Eğitim sadece sınıfta değil, hayatın her anında.</p>
+              <p className="eyebrow">{gallerySection?.eyebrow ?? "Kampüs & Yaşam"}</p>
+              <h2 id="gallery-title">{gallerySection?.title ?? "Dinamik'te Yaşam"}</h2>
+              <p className="gallery-description">{gallerySection?.description ?? "Eğitim sadece sınıfta değil, hayatın her anında."}</p>
               <a
                 className="button button--secondary button--small"
                 href={settings.instagramUrl}
@@ -340,7 +412,7 @@ export default async function Home() {
                 rel="noreferrer"
               >
                 <InstagramIcon />
-                Instagram&apos;da Gör
+                {gallerySection?.ctaLabel ?? "Instagram'da Gör"}
               </a>
             </div>
             <div className="gallery-grid">
@@ -357,8 +429,10 @@ export default async function Home() {
             </div>
           </div>
         </section>
+        ) : null}
 
-        <section className="campus-section" id="okulumuz" aria-labelledby="campus-title">
+        {campusSection?.isVisible !== false ? (
+        <section className={`campus-section${managedThemeClass(campusSection)}`} id="okulumuz" aria-labelledby="campus-title">
           <div className="container campus-grid">
             <div className="campus-media">
               <Image
@@ -377,11 +451,10 @@ export default async function Home() {
               </div>
             </div>
             <div className="campus-copy">
-              <p className="eyebrow">Neden Dinamik?</p>
-              <h2 id="campus-title">Geleceği yalnızca anlatmıyor, öğrencilerimizle birlikte inşa ediyoruz.</h2>
+              <p className="eyebrow">{campusSection?.eyebrow ?? "Neden Dinamik?"}</p>
+              <h2 id="campus-title">{campusSection?.title ?? "Geleceği yalnızca anlatmıyor, öğrencilerimizle birlikte inşa ediyoruz."}</h2>
               <p>
-                Modern teknik altyapıyı, uygulamalı eğitimi ve iş dünyasıyla kurulan güçlü
-                bağları öğrencilerimizin geleceğine dönüştürüyoruz.
+                {campusSection?.description ?? "Modern teknik altyapıyı, uygulamalı eğitimi ve iş dünyasıyla kurulan güçlü bağları öğrencilerimizin geleceğine dönüştürüyoruz."}
               </p>
               <div className="campus-features" id="kampus">
                 <div>
@@ -420,21 +493,23 @@ export default async function Home() {
                   </span>
                 </div>
               </div>
-              <a className="button button--light" href="#iletisim">
-                Okulumuzu Keşfedin
+              <a className="button button--light" href={campusSection?.ctaHref ?? "#iletisim"}>
+                {campusSection?.ctaLabel ?? "Okulumuzu Keşfedin"}
                 <ArrowRight size={17} aria-hidden="true" />
               </a>
             </div>
           </div>
         </section>
+        ) : null}
 
-        <section className="program-section" id="ogrenci" aria-labelledby="programs-title">
+        {programsSection?.isVisible !== false ? (
+        <section className={`program-section${managedThemeClass(programsSection)}`} id="ogrenci" aria-labelledby="programs-title">
           <div className="container">
             <SectionHeading
               id="programs-title"
-              eyebrow="Programlar"
-              title="Mesleki yetkinliğe giden yol"
-              description="Dört yıllık programlar; meslek etiği, iş sağlığı ve güvenliği, çevre bilinci, teknoloji ve uygulamayı birlikte ele alır."
+              eyebrow={programsSection?.eyebrow ?? "Programlar"}
+              title={programsSection?.title ?? "Mesleki yetkinliğe giden yol"}
+              description={programsSection?.description ?? "Dört yıllık programlar; meslek etiği, iş sağlığı ve güvenliği, çevre bilinci, teknoloji ve uygulamayı birlikte ele alır."}
             />
 
             <div className="program-grid">
@@ -510,15 +585,16 @@ export default async function Home() {
             </div>
           </div>
         </section>
+        ) : null}
 
-        <section className="guidance-section" aria-labelledby="guidance-title">
+        {guidanceSection?.isVisible !== false ? (
+        <section className={`guidance-section${managedThemeClass(guidanceSection)}`} aria-labelledby="guidance-title">
           <div className="container guidance-grid">
             <div className="guidance-copy">
-              <p className="eyebrow">Öğrenci &amp; Rehberlik</p>
-              <h2 id="guidance-title">Sadece bir bölüm değil, güçlü bir gelecek seçimi.</h2>
+              <p className="eyebrow">{guidanceSection?.eyebrow ?? "Öğrenci & Rehberlik"}</p>
+              <h2 id="guidance-title">{guidanceSection?.title ?? "Sadece bir bölüm değil, güçlü bir gelecek seçimi."}</h2>
               <p>
-                Öğrencilerimizin akademik, mesleki ve kişisel gelişimini; kariyer
-                farkındalığı, rehberlik çalışmaları ve sosyal etkinliklerle destekliyoruz.
+                {guidanceSection?.description ?? "Öğrencilerimizin akademik, mesleki ve kişisel gelişimini; kariyer farkındalığı, rehberlik çalışmaları ve sosyal etkinliklerle destekliyoruz."}
               </p>
             </div>
             <div className="guidance-cards">
@@ -540,15 +616,18 @@ export default async function Home() {
             </div>
           </div>
         </section>
+        ) : null}
 
-        <section className="registration-section" id="on-kayit" aria-labelledby="registration-title">
+        {customSections.map((section) => <CustomHomepageSection key={section.id} section={section} />)}
+
+        {registrationSection?.isVisible !== false ? (
+        <section className={`registration-section${managedThemeClass(registrationSection)}`} id="on-kayit" aria-labelledby="registration-title">
           <div className="container registration-grid">
             <div className="registration-copy">
-              <p className="eyebrow">Ön Kayıt Talebi</p>
-              <h2 id="registration-title">Sizi tanıyalım, doğru programı birlikte seçelim.</h2>
+              <p className="eyebrow">{registrationSection?.eyebrow ?? "Ön Kayıt Talebi"}</p>
+              <h2 id="registration-title">{registrationSection?.title ?? "Sizi tanıyalım, doğru programı birlikte seçelim."}</h2>
               <p>
-                Kısa formu doldurun; talebiniz okulun resmî WhatsApp hattına hazır mesaj
-                olarak aktarılsın. Kayıt ekibimiz uygun olduğunda sizinle iletişime geçsin.
+                {registrationSection?.description ?? "Kısa formu doldurun; talebiniz okulun resmî WhatsApp hattına hazır mesaj olarak aktarılsın. Kayıt ekibimiz uygun olduğunda sizinle iletişime geçsin."}
               </p>
               <ul>
                 <li><CheckCircle2 size={18} aria-hidden="true" /> Üç mesleki alan hakkında bilgi</li>
@@ -559,15 +638,16 @@ export default async function Home() {
             <RegistrationForm />
           </div>
         </section>
+        ) : null}
 
-        <section className="contact-section" id="iletisim" aria-labelledby="contact-title">
+        {contactSection?.isVisible !== false ? (
+        <section className={`contact-section${managedThemeClass(contactSection)}`} id="iletisim" aria-labelledby="contact-title">
           <div className="container contact-grid">
             <div className="contact-copy">
-              <p className="eyebrow eyebrow--light">Bize Ulaşın</p>
-              <h2 id="contact-title">Geleceğin için ilk adımı bugün at.</h2>
+              <p className="eyebrow eyebrow--light">{contactSection?.eyebrow ?? "Bize Ulaşın"}</p>
+              <h2 id="contact-title">{contactSection?.title ?? "Geleceğin için ilk adımı bugün at."}</h2>
               <p>
-                Bölümler, kayıt koşulları ve kampüs ziyareti hakkında bilgi almak için
-                okulumuza ulaşın.
+                {contactSection?.description ?? "Bölümler, kayıt koşulları ve kampüs ziyareti hakkında bilgi almak için okulumuza ulaşın."}
               </p>
               <div className="contact-actions">
                 <a className="button button--light" href={generalPhoneTel}>
@@ -608,6 +688,7 @@ export default async function Home() {
             </address>
           </div>
         </section>
+        ) : null}
       </main>
 
       <nav className="quick-links" aria-label="Hızlı erişim">

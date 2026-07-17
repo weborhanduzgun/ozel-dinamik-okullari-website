@@ -95,7 +95,11 @@ export async function SiteFooter() {
         </div>
         <div className="container footer-bottom">
           <span>© {new Date().getFullYear()} Dinamik Mesleki ve Teknik Anadolu Lisesi</span>
-          <span>Samsun / Türkiye</span>
+          <div className="footer-legal-links">
+            <Link href="/kvkk">KVKK Aydınlatma ve Veri Güvenliği</Link>
+            <span aria-hidden="true">•</span>
+            <span>Samsun / Türkiye</span>
+          </div>
         </div>
       </footer>
       <a

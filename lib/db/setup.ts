@@ -17,6 +17,9 @@ CREATE TABLE IF NOT EXISTS departments (
   skills TEXT NOT NULL,
   learning_areas TEXT NOT NULL,
   career_areas TEXT NOT NULL,
+  content_blocks TEXT,
+  is_visible INTEGER NOT NULL DEFAULT 1,
+  is_deletable INTEGER NOT NULL DEFAULT 0,
   sort_order INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS staff (
@@ -44,6 +47,38 @@ CREATE TABLE IF NOT EXISTS site_settings (
   hours TEXT NOT NULL,
   instagram_url TEXT NOT NULL,
   youtube_url TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS homepage_sections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  section_key TEXT NOT NULL UNIQUE,
+  section_type TEXT NOT NULL,
+  display_name TEXT NOT NULL,
+  eyebrow TEXT,
+  title TEXT NOT NULL,
+  description TEXT,
+  cta_label TEXT,
+  cta_href TEXT,
+  theme TEXT NOT NULL DEFAULT 'original',
+  is_visible INTEGER NOT NULL DEFAULT 1,
+  is_deletable INTEGER NOT NULL DEFAULT 0,
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS registration_applications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  student_name TEXT NOT NULL,
+  parent_name TEXT NOT NULL,
+  grade TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  department TEXT NOT NULL,
+  source TEXT NOT NULL DEFAULT '/on-kayit',
+  status TEXT NOT NULL DEFAULT 'new',
+  notes TEXT,
+  consent_accepted INTEGER NOT NULL DEFAULT 1,
+  privacy_notice_version TEXT NOT NULL DEFAULT 'legacy-consent',
+  whatsapp_consent INTEGER NOT NULL DEFAULT 0,
+  consent_accepted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 `;
 
@@ -76,9 +111,80 @@ type SiteSettingsSeed = {
   instagramUrl: string;
   youtubeUrl: string;
 };
+type HomepageSectionSeed = {
+  sectionKey: string;
+  sectionType: string;
+  displayName: string;
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  theme: string;
+  isVisible: boolean;
+  isDeletable: boolean;
+  sortOrder: number;
+};
 
 function readJson<T>(fileName: string): T {
   return JSON.parse(readFileSync(resolve(CONTENT_DIR, fileName), "utf8")) as T;
+}
+
+export function ensureDepartmentManagementColumns(db: DatabaseSync): void {
+  const columns = db.prepare("PRAGMA table_info(departments)").all() as Array<{ name: string }>;
+  const columnNames = new Set(columns.map((column) => column.name));
+  if (!columnNames.has("is_visible")) {
+    db.exec("ALTER TABLE departments ADD COLUMN is_visible INTEGER NOT NULL DEFAULT 1;");
+  }
+  if (!columnNames.has("is_deletable")) {
+    db.exec("ALTER TABLE departments ADD COLUMN is_deletable INTEGER NOT NULL DEFAULT 0;");
+  }
+  if (!columnNames.has("content_blocks")) {
+    db.exec("ALTER TABLE departments ADD COLUMN content_blocks TEXT;");
+  }
+}
+
+export function ensureRegistrationPrivacyColumns(db: DatabaseSync): void {
+  const columns = db.prepare("PRAGMA table_info(registration_applications)").all() as Array<{ name: string }>;
+  const columnNames = new Set(columns.map((column) => column.name));
+  if (!columnNames.has("privacy_notice_version")) {
+    db.exec("ALTER TABLE registration_applications ADD COLUMN privacy_notice_version TEXT NOT NULL DEFAULT 'legacy-consent';");
+  }
+  if (!columnNames.has("whatsapp_consent")) {
+    db.exec("ALTER TABLE registration_applications ADD COLUMN whatsapp_consent INTEGER NOT NULL DEFAULT 1;");
+  }
+  if (!columnNames.has("consent_accepted_at")) {
+    db.exec("ALTER TABLE registration_applications ADD COLUMN consent_accepted_at TEXT;");
+    db.exec("UPDATE registration_applications SET consent_accepted_at = created_at WHERE consent_accepted_at IS NULL;");
+  }
+}
+
+export function ensureHomepageSections(db: DatabaseSync): void {
+  const { count } = db.prepare("SELECT COUNT(*) as count FROM homepage_sections").get() as { count: number };
+  if (count > 0) return;
+
+  const sections = readJson<HomepageSectionSeed[]>("homepage-sections.json");
+  const insertSection = db.prepare(
+    `INSERT INTO homepage_sections
+      (section_key, section_type, display_name, eyebrow, title, description, cta_label, cta_href, theme, is_visible, is_deletable, sort_order)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  );
+  sections.forEach((section) => {
+    insertSection.run(
+      section.sectionKey,
+      section.sectionType,
+      section.displayName,
+      section.eyebrow ?? null,
+      section.title,
+      section.description ?? null,
+      section.ctaLabel ?? null,
+      section.ctaHref ?? null,
+      section.theme,
+      section.isVisible ? 1 : 0,
+      section.isDeletable ? 1 : 0,
+      section.sortOrder,
+    );
+  });
 }
 
 export function seedInitialContent(db: DatabaseSync): void {
@@ -136,4 +242,6 @@ export function seedInitialContent(db: DatabaseSync): void {
     settings.instagramUrl,
     settings.youtubeUrl,
   );
+
+  ensureHomepageSections(db);
 }

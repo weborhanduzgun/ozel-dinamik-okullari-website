@@ -8,7 +8,7 @@ import { getDepartments } from "../data/departments";
 
 export const metadata: Metadata = {
   title: "Bölümlerimiz",
-  description: "Dinamik Samsun'da eğitim verilen Kimya, Elektrik-Elektronik ve Biyomedikal Cihaz Teknolojileri alanlarını keşfedin.",
+  description: "Dinamik Samsun'da eğitim verilen güncel mesleki ve teknik programları keşfedin.",
   alternates: { canonical: "/bolumler" },
 };
 
@@ -19,7 +19,7 @@ export default async function DepartmentsPage() {
       <PageHero
         eyebrow="Teknolojiden mesleğe"
         title="İlgi alanını, geleceğinin güçlü bir parçasına dönüştür."
-        description="Üç aktif alan, üç farklı teknoloji dünyası ve uygulamayla güçlenen tek bir eğitim yaklaşımı."
+        description="Aktif mesleki alanlar, farklı teknoloji dünyaları ve uygulamayla güçlenen tek bir eğitim yaklaşımı."
         image="/images/hero-banner.png"
         current="Bölümlerimiz"
       />
@@ -29,7 +29,7 @@ export default async function DepartmentsPage() {
           <div className="inner-section-header">
             <div>
               <p className="inner-eyebrow">Aktif programlarımız</p>
-              <h2 id="departments-index-title">Üreten, ölçen ve çözüm geliştiren bir eğitim.</h2>
+              <h2 id="departments-index-title">Üreten, ölçen ve çözüm geliştiren mesleki alanlar.</h2>
             </div>
             <p>
               Her alan, okulda fiilen eğitim verilen dal üzerinden anlatılır. Program içerikleri,
@@ -39,7 +39,7 @@ export default async function DepartmentsPage() {
 
           <div className="department-index-grid">
             {departments.map((department, index) => (
-              <Link className="department-index-card" href={`/bolumler/${department.slug}`} key={department.slug}>
+              <Link className={`department-index-card department-index-card--${department.accent}`} href={`/bolumler/${department.slug}`} key={department.slug}>
                 <Image src={department.image} alt="" fill sizes="(max-width: 700px) calc(100vw - 48px), 32vw" />
                 <span className="department-index-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
                 <span className="department-index-card-content">

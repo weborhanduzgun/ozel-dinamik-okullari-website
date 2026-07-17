@@ -1,15 +1,29 @@
 import Link from "next/link";
-import { ArrowRight, ContactRound, Images, Settings2, Shapes } from "lucide-react";
+import { ArrowRight, ClipboardList, ContactRound, Images, LayoutTemplate, Settings2, Shapes } from "lucide-react";
 import { getDb, schema } from "@/lib/db/client";
 import { AdminPageHeader } from "../AdminPageHeader";
 
 const QUICK_LINKS = [
+  {
+    href: "/admin/bilesenler",
+    title: "Sayfa Bileşenleri",
+    description: "Ana sayfa alanlarını ekleyin, gizleyin, düzenleyin ve temalarını değiştirin.",
+    icon: LayoutTemplate,
+    tone: "indigo",
+  },
   {
     href: "/admin/bolumler",
     title: "Bölümler",
     description: "Mesleki alanların tanıtım metinlerini ve görsellerini düzenleyin.",
     icon: Shapes,
     tone: "indigo",
+  },
+  {
+    href: "/admin/basvurular",
+    title: "Ön Kayıt Başvuruları",
+    description: "Yeni öğrenci ve veli başvurularını inceleyin, iletişim durumunu takip edin.",
+    icon: ClipboardList,
+    tone: "red",
   },
   {
     href: "/admin/kadromuz",
@@ -36,16 +50,20 @@ const QUICK_LINKS = [
 
 export default async function AdminHomePage() {
   const db = getDb();
-  const [departments, staff, gallery] = await Promise.all([
+  const [departments, staff, gallery, homepageSections, applications] = await Promise.all([
     db.select({ id: schema.departments.id }).from(schema.departments),
     db.select({ id: schema.staff.id }).from(schema.staff),
     db.select({ id: schema.galleryImages.id }).from(schema.galleryImages),
+    db.select({ id: schema.homepageSections.id }).from(schema.homepageSections),
+    db.select({ id: schema.registrationApplications.id, status: schema.registrationApplications.status }).from(schema.registrationApplications),
   ]);
 
   const stats = [
     { label: "Aktif bölüm", value: departments.length, icon: Shapes, tone: "indigo" },
     { label: "Kadro kaydı", value: staff.length, icon: ContactRound, tone: "red" },
     { label: "Galeri görseli", value: gallery.length, icon: Images, tone: "cyan" },
+    { label: "Sayfa bileşeni", value: homepageSections.length, icon: LayoutTemplate, tone: "amber" },
+    { label: "Yeni başvuru", value: applications.filter((item) => item.status === "new").length, icon: ClipboardList, tone: "red" },
   ] as const;
 
   return (

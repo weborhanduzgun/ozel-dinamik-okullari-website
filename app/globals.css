@@ -1778,6 +1778,47 @@ a {
   line-height: 1.55;
 }
 
+.consent-field a {
+  color: var(--brand-navy-deep);
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 0, 0, 0.35);
+  text-underline-offset: 3px;
+}
+
+.consent-field a:hover {
+  color: var(--brand-red);
+}
+
+.consent-field--optional {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.consent-field--optional span strong {
+  color: var(--brand-navy-deep);
+}
+
+.privacy-consent-panel {
+  padding: 14px 16px;
+  border: 1px solid rgba(45, 41, 88, 0.12);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(45, 41, 88, 0.045), rgba(255, 0, 0, 0.035));
+}
+
+.privacy-consent-panel strong {
+  display: block;
+  color: var(--brand-navy-deep);
+  font-size: 0.72rem;
+}
+
+.privacy-consent-panel p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 0.65rem;
+  line-height: 1.55;
+}
+
 .form-footer {
   display: flex;
   align-items: center;
@@ -1810,6 +1851,12 @@ a {
 
 .form-status--error {
   color: #b3233a;
+}
+
+.registration-form button:disabled {
+  opacity: 0.68;
+  cursor: wait;
+  transform: none;
 }
 
 .contact-section {
@@ -2018,6 +2065,21 @@ a {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   color: rgba(255, 255, 255, 0.48);
   font-size: 0.65rem;
+}
+
+.footer-legal-links {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.footer-legal-links a {
+  color: rgba(255, 255, 255, 0.62);
+  font-weight: 700;
+}
+
+.footer-legal-links a:hover {
+  color: #ff4d4d;
 }
 
 .floating-whatsapp {

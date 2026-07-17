@@ -3,7 +3,7 @@ import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import * as schema from "./schema";
-import { CREATE_TABLES_SQL, seedInitialContent } from "./setup";
+import { CREATE_TABLES_SQL, ensureDepartmentManagementColumns, ensureHomepageSections, ensureRegistrationPrivacyColumns, seedInitialContent } from "./setup";
 
 const DB_PATH = resolve(process.cwd(), "data", "app.db");
 
@@ -16,11 +16,14 @@ function getSqlite(): DatabaseSync {
   sqlite = new DatabaseSync(DB_PATH);
   sqlite.exec("PRAGMA journal_mode = WAL;");
   sqlite.exec(CREATE_TABLES_SQL);
+  ensureDepartmentManagementColumns(sqlite);
+  ensureRegistrationPrivacyColumns(sqlite);
 
   const { count } = sqlite.prepare("SELECT COUNT(*) as count FROM departments").get() as { count: number };
   if (count === 0) {
     seedInitialContent(sqlite);
   }
+  ensureHomepageSections(sqlite);
 
   return sqlite;
 }

@@ -6,8 +6,84 @@ import { notFound } from "next/navigation";
 import { InnerPageShell } from "../../components/SiteChrome";
 import { PageHero } from "../../components/PageHero";
 import { getDepartment, getDepartments } from "../../data/departments";
+import type { DepartmentContentBlock } from "@/lib/department-blocks";
+import { linesToList, linesToPairs, linesToTitledPairs } from "@/lib/textformat";
 
 type DepartmentPageProps = { params: Promise<{ slug: string }> };
+
+const CONTENT_ICONS = [Compass, Gauge, ShieldCheck];
+
+function DepartmentContentBlockView({ block, isFirst }: { block: DepartmentContentBlock; isFirst: boolean }) {
+  const headingId = `department-block-${block.id.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+
+  if (block.type === "info-cards") {
+    const facts = linesToPairs(block.content);
+    return (
+      <section className={`department-content-block department-content-block--info${isFirst ? " is-first" : ""}`} aria-labelledby={headingId}>
+        <div className="container department-block-heading department-block-heading--compact"><p className="inner-eyebrow">Program bilgileri</p><h2 id={headingId}>{block.title}</h2></div>
+        <div className="container metric-band-grid">
+          {facts.map((fact, index) => {
+            const Icon = CONTENT_ICONS[index % CONTENT_ICONS.length];
+            return <div className="metric-band-item" key={`${block.id}-${index}`}><span className="metric-band-icon"><Icon size={21} /></span><span><small>{fact.label}</small><strong>{fact.value}</strong></span></div>;
+          })}
+        </div>
+      </section>
+    );
+  }
+
+  if (block.type === "skills") {
+    return (
+      <section className="inner-section department-content-block" aria-labelledby={headingId}>
+        <div className="container department-list-block">
+          <div className="department-block-heading"><p className="inner-eyebrow">Beceriler</p><h2 id={headingId}>{block.title}</h2></div>
+          <ul className="check-list-grid">
+            {linesToList(block.content).map((skill, index) => <li key={`${block.id}-${index}`}><CheckCircle2 size={17} aria-hidden="true" />{skill}</li>)}
+          </ul>
+        </div>
+      </section>
+    );
+  }
+
+  if (block.type === "learning-cards") {
+    return (
+      <section className="inner-section inner-section--soft department-content-block" aria-labelledby={headingId}>
+        <div className="container">
+          <div className="department-block-heading"><p className="inner-eyebrow">Öğrenme alanları</p><h2 id={headingId}>{block.title}</h2></div>
+          <div className="detail-skill-grid">
+            {linesToTitledPairs(block.content).map((area, index) => {
+              const Icon = CONTENT_ICONS[index % CONTENT_ICONS.length];
+              return <article className="detail-skill-card" key={`${block.id}-${index}`}><span><Icon size={23} /></span><h3>{area.title}</h3><p>{area.text}</p></article>;
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (block.type === "career-tags") {
+    return (
+      <section className="inner-section inner-section--navy department-content-block" aria-labelledby={headingId}>
+        <div className="container editorial-grid editorial-grid--reverse">
+          <div className="editorial-visual"><div className="image-frame image-frame--landscape"><Image src="/images/about-school-campus.png" alt="Dinamik Okulları kampüsü" fill sizes="(max-width: 900px) calc(100vw - 48px), 46vw" /></div></div>
+          <div className="editorial-copy editorial-copy--light">
+            <p className="inner-eyebrow inner-eyebrow--light">Kariyer rotası</p>
+            <h2 id={headingId}>{block.title}</h2>
+            <div className="career-cloud">{linesToList(block.content).map((area, index) => <span key={`${block.id}-${index}`}>{area}</span>)}</div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="inner-section department-content-block" aria-labelledby={headingId}>
+      <div className="container department-text-block">
+        <div className="department-block-heading"><p className="inner-eyebrow">Bilgiler</p><h2 id={headingId}>{block.title}</h2></div>
+        <div className="department-text-block-copy">{linesToList(block.content).map((paragraph, index) => <p key={`${block.id}-${index}`}>{paragraph}</p>)}</div>
+      </div>
+    </section>
+  );
+}
 
 export async function generateStaticParams() {
   const departments = await getDepartments();
@@ -32,17 +108,9 @@ export default async function DepartmentPage({ params }: DepartmentPageProps) {
 
   return (
     <InnerPageShell>
-      <PageHero eyebrow={department.branch} title={department.title} description={department.lead} image={department.image} current={department.shortTitle} />
+      <PageHero eyebrow={department.branch} title={department.title} description={department.lead} image={department.image} current={department.shortTitle} accent={department.accent} />
 
-      <div className="metric-band">
-        <div className="container metric-band-grid">
-          {department.facts.map((fact, index) => {
-            const icons = [Compass, Gauge, ShieldCheck];
-            const Icon = icons[index];
-            return <div className="metric-band-item" key={fact.label}><span className="metric-band-icon"><Icon size={21} /></span><span><small>{fact.label}</small><strong>{fact.value}</strong></span></div>;
-          })}
-        </div>
-      </div>
+      {department.contentBlocks[0]?.type === "info-cards" ? <DepartmentContentBlockView block={department.contentBlocks[0]} isFirst /> : null}
 
       <section className="inner-section">
         <div className="container editorial-grid">
@@ -54,36 +122,13 @@ export default async function DepartmentPage({ params }: DepartmentPageProps) {
             <p className="inner-eyebrow">Programın amacı</p>
             <h2>Teknik bilgiyi güvenli, dikkatli ve üretken bir çalışma kültürüne dönüştür.</h2>
             <p>{department.purpose}</p>
-            <ul className="check-list-grid">
-              {department.skills.map((skill) => <li key={skill}><CheckCircle2 size={17} aria-hidden="true" />{skill}</li>)}
-            </ul>
           </div>
         </div>
       </section>
 
-      <section className="inner-section inner-section--soft" aria-labelledby="learning-title">
-        <div className="container">
-          <div className="inner-section-header"><div><p className="inner-eyebrow">Ne öğreneceksin?</p><h2 id="learning-title">Uygulama içinde gelişen teknik yetkinlikler.</h2></div><p>Program yalnızca ekipman kullanımını değil; planlama, güvenlik, ölçüm, yorumlama ve ekip çalışmasını da geliştirir.</p></div>
-          <div className="detail-skill-grid">
-            {department.learningAreas.map((area, index) => {
-              const icons = [Gauge, ShieldCheck, Compass]; const Icon = icons[index];
-              return <article className="detail-skill-card" key={area.title}><span><Icon size={23} /></span><h3>{area.title}</h3><p>{area.text}</p></article>;
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="inner-section inner-section--navy">
-        <div className="container editorial-grid editorial-grid--reverse">
-          <div className="editorial-visual"><div className="image-frame image-frame--landscape"><Image src="/images/about-school-campus.png" alt="Dinamik Okulları kampüsü" fill sizes="(max-width: 900px) calc(100vw - 48px), 46vw" /></div></div>
-          <div className="editorial-copy editorial-copy--light">
-            <p className="inner-eyebrow inner-eyebrow--light">Kariyer rotası</p>
-            <h2>Meslek, yükseköğretim ve teknoloji dünyasına açık bir başlangıç.</h2>
-            <p>Kazandığın teknik altyapıyı ilgili sektörlerde, teknik hizmet birimlerinde veya yükseköğretimin ilgili programlarında geliştirebilirsin.</p>
-            <div className="career-cloud">{department.careerAreas.map((area) => <span key={area}>{area}</span>)}</div>
-          </div>
-        </div>
-      </section>
+      {department.contentBlocks.map((block, index) => (
+        index === 0 && block.type === "info-cards" ? null : <DepartmentContentBlockView block={block} isFirst={false} key={block.id} />
+      ))}
 
       <section className="inner-section">
         <div className="container cta-panel">

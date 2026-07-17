@@ -16,7 +16,7 @@ mkdirSync(dirname(DB_PATH), { recursive: true });
 const db = new DatabaseSync(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL;");
 db.exec(CREATE_TABLES_SQL);
-db.exec("DELETE FROM departments; DELETE FROM staff; DELETE FROM gallery_images; DELETE FROM site_settings;");
+db.exec("DELETE FROM departments; DELETE FROM staff; DELETE FROM gallery_images; DELETE FROM site_settings; DELETE FROM homepage_sections;");
 seedInitialContent(db);
 
 console.log("Database reseeded from /content JSON snapshots.");

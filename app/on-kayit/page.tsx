@@ -19,7 +19,7 @@ export default function RegistrationPage() {
           <div className="registration-page-copy">
             <p className="inner-eyebrow">Ön kayıt bilgi talebi</p>
             <h2>Dinamik bir geleceğe hazır mısın?</h2>
-            <p>Form, bilgilerinizi saklamaz. Onayınızla WhatsApp&apos;ta hazır bir mesaj oluşturur; göndermeden önce içeriği siz kontrol edersiniz.</p>
+            <p>Başvurunuz okulun güvenli yönetim paneline kaydedilir. İsteğe bağlı tercihinizle WhatsApp&apos;ta hazır bir mesaj da oluşturulur; göndermeden önce içeriği siz kontrol edersiniz.</p>
             <ul>
               <li><CheckCircle2 size={18} />Üç aktif mesleki alan hakkında bilgi</li>
               <li><CheckCircle2 size={18} />Kampüs ve atölye ziyareti planlama</li>

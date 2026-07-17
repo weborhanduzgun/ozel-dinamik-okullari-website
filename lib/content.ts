@@ -15,6 +15,27 @@ export type SiteSettings = {
   youtubeUrl: string;
 };
 
+export const HOMEPAGE_SECTION_THEMES = ["original", "light", "navy", "red"] as const;
+export const CUSTOM_HOMEPAGE_SECTION_TYPES = ["custom-content", "custom-announcement", "custom-cta"] as const;
+
+export type HomepageSectionTheme = (typeof HOMEPAGE_SECTION_THEMES)[number];
+export type CustomHomepageSectionType = (typeof CUSTOM_HOMEPAGE_SECTION_TYPES)[number];
+export type HomepageSection = {
+  id: number;
+  sectionKey: string;
+  sectionType: string;
+  displayName: string;
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  theme: HomepageSectionTheme;
+  isVisible: boolean;
+  isDeletable: boolean;
+  sortOrder: number;
+};
+
 export async function getGalleryImages(): Promise<GalleryImage[]> {
   const db = getDb();
   const rows = await db.select().from(schema.galleryImages).orderBy(asc(schema.galleryImages.sortOrder));
@@ -37,4 +58,26 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     instagramUrl: row.instagramUrl,
     youtubeUrl: row.youtubeUrl,
   };
+}
+
+export async function getHomepageSections(): Promise<HomepageSection[]> {
+  const db = getDb();
+  const rows = await db.select().from(schema.homepageSections).orderBy(asc(schema.homepageSections.sortOrder));
+  return rows.map((row) => ({
+    id: row.id,
+    sectionKey: row.sectionKey,
+    sectionType: row.sectionType,
+    displayName: row.displayName,
+    eyebrow: row.eyebrow ?? undefined,
+    title: row.title,
+    description: row.description ?? undefined,
+    ctaLabel: row.ctaLabel ?? undefined,
+    ctaHref: row.ctaHref ?? undefined,
+    theme: HOMEPAGE_SECTION_THEMES.includes(row.theme as HomepageSectionTheme)
+      ? (row.theme as HomepageSectionTheme)
+      : "original",
+    isVisible: row.isVisible,
+    isDeletable: row.isDeletable,
+    sortOrder: row.sortOrder,
+  }));
 }

@@ -2,13 +2,19 @@
 
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { FormEvent, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { createRegistrationApplicationAction } from "@/lib/actions/registration-applications";
+import { PRIVACY_NOTICE_VERSION } from "@/lib/privacy";
 
 const WHATSAPP_NUMBER = "905467765060";
 
 export function RegistrationForm() {
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const pathname = usePathname();
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [statusMessage, setStatusMessage] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
 
@@ -19,6 +25,7 @@ export function RegistrationForm() {
 
     const data = new FormData(form);
     if (String(data.get("website") ?? "").trim()) return;
+    data.set("source", pathname);
 
     const studentName = String(data.get("studentName") ?? "").trim();
     const parentName = String(data.get("parentName") ?? "").trim();
@@ -35,15 +42,29 @@ export function RegistrationForm() {
       `Telefon: ${phone}`,
     ].join("\n");
 
+    const whatsappConsent = data.get("whatsappConsent") === "on";
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    const whatsappWindow = window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    const whatsappWindow = whatsappConsent ? window.open("about:blank", "_blank") : null;
+    if (whatsappWindow) whatsappWindow.opener = null;
 
-    if (!whatsappWindow) {
+    setStatus("submitting");
+    setStatusMessage("");
+    const result = await createRegistrationApplicationAction(data);
+    if (!result.success) {
+      whatsappWindow?.close();
       setStatus("error");
+      setStatusMessage(result.message);
       return;
     }
 
+    if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
+    form.reset();
     setStatus("success");
+    setStatusMessage(whatsappConsent
+      ? (whatsappWindow
+        ? "Başvurunuz kaydedildi. WhatsApp mesajını kontrol edip gönderebilirsiniz."
+        : "Başvurunuz kaydedildi. WhatsApp açılamadı; okul ekibi sizinle iletişime geçecek.")
+      : "Başvurunuz güvenle kaydedildi. Okul ekibi verdiğiniz telefon üzerinden sizinle iletişime geçecek.");
   }
 
   return (
@@ -101,30 +122,43 @@ export function RegistrationForm() {
         <input name="website" tabIndex={-1} autoComplete="off" />
       </label>
 
+      <input name="privacyNoticeVersion" type="hidden" value={PRIVACY_NOTICE_VERSION} />
+
+      <div className="privacy-consent-panel">
+        <strong>Gizlilik tercihleri</strong>
+        <p>Bilgilerinizi yalnızca başvurunuzu yanıtlamak ve kayıt sürecini yürütmek için kullanırız.</p>
+      </div>
+
       <label className="consent-field">
-        <input name="consent" type="checkbox" required />
+        <input name="privacyNoticeAcknowledged" type="checkbox" required />
         <span>
-          Bilgilerimin kayıt talebime dönüş yapılması amacıyla okulun resmî WhatsApp
-          hattına aktarılmasını kabul ediyorum.
+          <Link href="/kvkk#aydinlatma" target="_blank">Ön Kayıt KVKK Aydınlatma Metni</Link>&apos;ni
+          okudum ve kişisel verilerimin nasıl işlendiği konusunda bilgilendirildim.
+        </span>
+      </label>
+
+      <label className="consent-field consent-field--optional">
+        <input name="whatsappConsent" type="checkbox" />
+        <span>
+          <strong>İsteğe bağlı:</strong>{" "}Başvuru bilgilerimi içeren hazır mesajın WhatsApp&apos;ta
+          açılmasını istiyorum. Bu işlem bilgilerimi WhatsApp hizmetine aktarabilir; mesajı
+          göndermediğim sürece bilgiler WhatsApp üzerinden okula iletilmez.
         </span>
       </label>
 
       <div className="form-footer">
         <p>
-          Bu site form verilerini saklamaz. Gönderim, onayınızla WhatsApp üzerinden
-          tamamlanır.
+          Gizlilik tercihiniz ve aydınlatma metni sürümü başvuruyla birlikte kaydedilir.
         </p>
-        <button className="button button--primary" type="submit">
-          WhatsApp ile Talep Gönder
+        <button className="button button--primary" type="submit" disabled={status === "submitting"}>
+          {status === "submitting" ? "Başvuru kaydediliyor..." : "Başvuruyu Gönder"}
           <ArrowRight size={17} aria-hidden="true" />
         </button>
       </div>
 
       <p className={`form-status form-status--${status}`} aria-live="polite">
-        {status === "success" ? (
-          <><CheckCircle2 size={17} aria-hidden="true" /> WhatsApp açıldı. Mesajı kontrol edip gönderin.</>
-        ) : null}
-        {status === "error" ? "Lütfen zorunlu alanları kontrol edin veya açılır pencereye izin verin." : null}
+        {status === "success" ? <><CheckCircle2 size={17} aria-hidden="true" /> {statusMessage}</> : null}
+        {status === "error" ? statusMessage || "Lütfen zorunlu alanları kontrol edin." : null}
       </p>
     </form>
   );

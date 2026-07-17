@@ -107,6 +107,7 @@ test("exports every primary frontend route with working internal navigation", as
     "/rehberlik",
     "/iletisim",
     "/on-kayit",
+    "/kvkk",
   ];
 
   for (const route of routes) {
@@ -115,6 +116,22 @@ test("exports every primary frontend route with working internal navigation", as
     assert.match(html, /aria-label="Ana navigasyon"/i, `${route} needs shared navigation`);
     assert.match(html, /Dinamik Okulları/i, `${route} needs the school brand`);
   }
+});
+
+test("publishes a clear KVKK notice and separates optional WhatsApp preference", async () => {
+  const [kvkkHtml, registrationHtml] = await Promise.all([
+    readRoute("/kvkk"),
+    readRoute("/on-kayit"),
+  ]);
+
+  assert.match(kvkkHtml, /Ön kayıt aydınlatma metni/i);
+  assert.match(kvkkHtml, /Veri sorumlusu/i);
+  assert.match(kvkkHtml, /KVKK Madde 11/i);
+  assert.match(kvkkHtml, /Veri güvenliği/i);
+  assert.match(registrationHtml, /name="privacyNoticeAcknowledged"/i);
+  assert.match(registrationHtml, /name="whatsappConsent"/i);
+  assert.match(registrationHtml, /İsteğe bağlı/i);
+  assert.match(registrationHtml, /href="\/kvkk#aydinlatma"/i);
 });
 
 test("redirects unauthenticated admin requests to the login page", async () => {

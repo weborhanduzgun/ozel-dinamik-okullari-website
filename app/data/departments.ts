@@ -1,5 +1,6 @@
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { getDb, schema } from "../../lib/db/client";
+import { normalizeDepartmentBlocks, type DepartmentContentBlock } from "@/lib/department-blocks";
 
 export type DepartmentAccent = "red" | "indigo" | "cyan";
 
@@ -16,11 +17,14 @@ export type Department = {
   skills: string[];
   learningAreas: Array<{ title: string; text: string }>;
   careerAreas: string[];
+  contentBlocks: DepartmentContentBlock[];
 };
 
 export async function getDepartments(): Promise<Department[]> {
   const db = getDb();
-  const rows = await db.select().from(schema.departments).orderBy(asc(schema.departments.sortOrder));
+  const rows = await db.select().from(schema.departments)
+    .where(eq(schema.departments.isVisible, true))
+    .orderBy(asc(schema.departments.sortOrder));
   return rows.map((row) => ({
     slug: row.slug,
     shortTitle: row.shortTitle,
@@ -34,6 +38,7 @@ export async function getDepartments(): Promise<Department[]> {
     skills: row.skills,
     learningAreas: row.learningAreas,
     careerAreas: row.careerAreas,
+    contentBlocks: normalizeDepartmentBlocks(row.contentBlocks, row),
   }));
 }
 
