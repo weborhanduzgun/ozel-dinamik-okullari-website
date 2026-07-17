@@ -1,5 +1,7 @@
 import { getDb, schema } from "@/lib/db/client";
 import { updateSettingsAction } from "@/lib/actions/settings";
+import { Save } from "lucide-react";
+import { AdminPageHeader } from "../../AdminPageHeader";
 
 export default async function AdminSettingsPage({
   searchParams,
@@ -11,9 +13,12 @@ export default async function AdminSettingsPage({
   const row = (await db.select().from(schema.siteSettings))[0];
 
   return (
-    <div>
-      <h1>Site Ayarları</h1>
-      <p className="admin-page-desc">İletişim bilgileri, sosyal medya bağlantıları ve çalışma saatleri sitenin her yerinde bu değerleri kullanır.</p>
+    <>
+      <AdminPageHeader
+        eyebrow="Kurumsal bilgiler"
+        title="Site Ayarları"
+        description="İletişim bilgileri, sosyal medya bağlantıları ve çalışma saatleri sitenin her yerinde bu değerleri kullanır."
+      />
       {saved ? <div className="admin-flash">Kaydedildi.</div> : null}
       <div className="admin-card">
         <form className="admin-form" action={updateSettingsAction}>
@@ -60,10 +65,10 @@ export default async function AdminSettingsPage({
             </label>
           </div>
           <div className="admin-actions">
-            <button className="admin-btn" type="submit">Kaydet</button>
+            <button className="admin-btn" type="submit"><Save aria-hidden="true" size={16} /> Değişiklikleri kaydet</button>
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 }

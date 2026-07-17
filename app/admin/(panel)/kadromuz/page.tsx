@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { asc } from "drizzle-orm";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { getDb, schema } from "@/lib/db/client";
 import { deleteStaffAction } from "@/lib/actions/staff";
 import { ConfirmSubmitButton } from "../../ConfirmSubmitButton";
+import { AdminPageHeader } from "../../AdminPageHeader";
 
 export default async function AdminStaffPage({
   searchParams,
@@ -20,12 +22,14 @@ export default async function AdminStaffPage({
   }
 
   return (
-    <div>
-      <h1>Kadromuz</h1>
-      <p className="admin-page-desc">{rows.length} öğretmen, {grouped.size} branş grubu.</p>
+    <>
+      <AdminPageHeader
+        eyebrow="Eğitim kadrosu"
+        title="Kadromuz"
+        description={`${rows.length} öğretmen, ${grouped.size} branş grubu. Kadro bilgilerini ekleyin, düzenleyin veya güncelliğini yitiren kayıtları kaldırın.`}
+        actions={<Link className="admin-btn" href="/admin/kadromuz/yeni"><Plus aria-hidden="true" size={16} /> Yeni öğretmen</Link>}
+      />
       {saved ? <div className="admin-flash">Kaydedildi.</div> : null}
-      <Link className="admin-btn" href="/admin/kadromuz/yeni">+ Yeni öğretmen ekle</Link>
-      <div style={{ height: 18 }} />
       {[...grouped.entries()].map(([category, members]) => (
         <div className="admin-card" key={category}>
           <strong>{category}</strong> <span className="admin-hint">{members[0]?.role ?? ""}</span>
@@ -36,12 +40,12 @@ export default async function AdminStaffPage({
                   <td>{member.name}</td>
                   <td className="admin-actions">
                     <Link className="admin-btn admin-btn-secondary" href={`/admin/kadromuz/${member.id}`}>
-                      Düzenle
+                      <Pencil aria-hidden="true" size={14} /> Düzenle
                     </Link>
                     <form action={deleteStaffAction}>
                       <input type="hidden" name="id" value={member.id} />
                       <ConfirmSubmitButton className="admin-btn admin-btn-danger" confirmMessage={`${member.name} kaldırılsın mı?`}>
-                        Sil
+                        <Trash2 aria-hidden="true" size={14} /> Sil
                       </ConfirmSubmitButton>
                     </form>
                   </td>
@@ -52,6 +56,6 @@ export default async function AdminStaffPage({
         </div>
       ))}
       {rows.length === 0 ? <p className="admin-empty">Henüz kayıtlı öğretmen yok.</p> : null}
-    </div>
+    </>
   );
 }

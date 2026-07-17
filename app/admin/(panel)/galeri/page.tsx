@@ -1,7 +1,9 @@
 import { asc } from "drizzle-orm";
+import { Trash2, Upload } from "lucide-react";
 import { getDb, schema } from "@/lib/db/client";
 import { deleteGalleryImageAction, uploadGalleryImageAction } from "@/lib/actions/gallery";
 import { ConfirmSubmitButton } from "../../ConfirmSubmitButton";
+import { AdminPageHeader } from "../../AdminPageHeader";
 
 export default async function AdminGalleryPage({
   searchParams,
@@ -13,9 +15,12 @@ export default async function AdminGalleryPage({
   const rows = await db.select().from(schema.galleryImages).orderBy(asc(schema.galleryImages.sortOrder));
 
   return (
-    <div>
-      <h1>Galeri</h1>
-      <p className="admin-page-desc">{rows.length} görsel. Yeni fotoğraf yükleyin veya mevcutları kaldırın.</p>
+    <>
+      <AdminPageHeader
+        eyebrow="Medya kütüphanesi"
+        title="Galeri"
+        description={`${rows.length} görsel yayında. Yeni fotoğraf yükleyin veya artık kullanılmayan görselleri kaldırın.`}
+      />
       {saved ? <div className="admin-flash">Kaydedildi.</div> : null}
       <div className="admin-card">
         <form className="admin-form" action={uploadGalleryImageAction} encType="multipart/form-data">
@@ -32,7 +37,7 @@ export default async function AdminGalleryPage({
             <input type="text" name="caption" placeholder="Örn. Kimya laboratuvarı" />
           </label>
           <div className="admin-actions">
-            <button className="admin-btn" type="submit">Yükle</button>
+            <button className="admin-btn" type="submit"><Upload aria-hidden="true" size={16} /> Görseli yükle</button>
           </div>
         </form>
       </div>
@@ -46,7 +51,7 @@ export default async function AdminGalleryPage({
               <form action={deleteGalleryImageAction}>
                 <input type="hidden" name="id" value={row.id} />
                 <ConfirmSubmitButton className="admin-btn admin-btn-danger" confirmMessage="Bu görsel kaldırılsın mı?">
-                  Sil
+                  <Trash2 aria-hidden="true" size={14} /> Sil
                 </ConfirmSubmitButton>
               </form>
             </div>
@@ -54,6 +59,6 @@ export default async function AdminGalleryPage({
         ))}
         {rows.length === 0 ? <p className="admin-empty">Henüz görsel eklenmedi.</p> : null}
       </div>
-    </div>
+    </>
   );
 }

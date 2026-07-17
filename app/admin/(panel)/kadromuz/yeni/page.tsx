@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { ArrowLeft, Plus } from "lucide-react";
 import { getDb, schema } from "@/lib/db/client";
 import { createStaffAction } from "@/lib/actions/staff";
+import { AdminPageHeader } from "../../../AdminPageHeader";
 
 export default async function AdminNewStaffPage() {
   const db = getDb();
@@ -8,8 +10,13 @@ export default async function AdminNewStaffPage() {
   const categories = [...new Set(rows.map((row) => row.category))];
 
   return (
-    <div>
-      <h1>Yeni öğretmen ekle</h1>
+    <>
+      <AdminPageHeader
+        eyebrow="Yeni kadro kaydı"
+        title="Yeni öğretmen ekle"
+        description="Öğretmenin adını, branş grubunu ve unvanını girerek kadroya ekleyin."
+        actions={<Link className="admin-btn admin-btn-secondary" href="/admin/kadromuz"><ArrowLeft aria-hidden="true" size={16} /> Kadroya dön</Link>}
+      />
       <div className="admin-card">
         <form className="admin-form" action={createStaffAction}>
           <label>
@@ -30,11 +37,11 @@ export default async function AdminNewStaffPage() {
             ))}
           </datalist>
           <div className="admin-actions">
-            <button className="admin-btn" type="submit">Ekle</button>
+            <button className="admin-btn" type="submit"><Plus aria-hidden="true" size={16} /> Öğretmeni ekle</button>
             <Link className="admin-btn admin-btn-secondary" href="/admin/kadromuz">Vazgeç</Link>
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 }

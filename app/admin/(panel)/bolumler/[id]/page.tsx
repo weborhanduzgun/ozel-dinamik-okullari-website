@@ -1,9 +1,11 @@
 import { eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
 import { getDb, schema } from "@/lib/db/client";
 import { updateDepartmentAction } from "@/lib/actions/departments";
 import { listToLines, pairsToLines, titledPairsToLines } from "@/lib/textformat";
+import { AdminPageHeader } from "../../../AdminPageHeader";
 
 export default async function AdminDepartmentEditPage({
   params,
@@ -16,9 +18,13 @@ export default async function AdminDepartmentEditPage({
   if (!row) notFound();
 
   return (
-    <div>
-      <h1>{row.title}</h1>
-      <p className="admin-page-desc">Bölüm bilgilerini düzenleyin. Liste alanlarında her satır bir madde olarak kabul edilir.</p>
+    <>
+      <AdminPageHeader
+        eyebrow="Bölüm düzenleme"
+        title={row.title}
+        description="Bölüm bilgilerini düzenleyin. Liste alanlarında her satır bir madde olarak kabul edilir."
+        actions={<Link className="admin-btn admin-btn-secondary" href="/admin/bolumler"><ArrowLeft aria-hidden="true" size={16} /> Bölümlere dön</Link>}
+      />
       <div className="admin-card">
         <form className="admin-form" action={updateDepartmentAction} encType="multipart/form-data">
           <input type="hidden" name="id" value={row.id} />
@@ -74,11 +80,11 @@ export default async function AdminDepartmentEditPage({
             <textarea name="careerAreas" defaultValue={listToLines(row.careerAreas)} />
           </label>
           <div className="admin-actions">
-            <button className="admin-btn" type="submit">Kaydet</button>
+            <button className="admin-btn" type="submit"><Save aria-hidden="true" size={16} /> Değişiklikleri kaydet</button>
             <Link className="admin-btn admin-btn-secondary" href="/admin/bolumler">Vazgeç</Link>
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
 import { getDb, schema } from "@/lib/db/client";
 import { updateStaffAction } from "@/lib/actions/staff";
+import { AdminPageHeader } from "../../../AdminPageHeader";
 
 export default async function AdminEditStaffPage({
   params,
@@ -18,8 +20,13 @@ export default async function AdminEditStaffPage({
   const categories = [...new Set(categoryRows.map((item) => item.category))];
 
   return (
-    <div>
-      <h1>{row.name}</h1>
+    <>
+      <AdminPageHeader
+        eyebrow="Kadro düzenleme"
+        title={row.name}
+        description="Öğretmenin branş ve unvan bilgilerini güncelleyin."
+        actions={<Link className="admin-btn admin-btn-secondary" href="/admin/kadromuz"><ArrowLeft aria-hidden="true" size={16} /> Kadroya dön</Link>}
+      />
       <div className="admin-card">
         <form className="admin-form" action={updateStaffAction}>
           <input type="hidden" name="id" value={row.id} />
@@ -41,11 +48,11 @@ export default async function AdminEditStaffPage({
             ))}
           </datalist>
           <div className="admin-actions">
-            <button className="admin-btn" type="submit">Kaydet</button>
+            <button className="admin-btn" type="submit"><Save aria-hidden="true" size={16} /> Değişiklikleri kaydet</button>
             <Link className="admin-btn admin-btn-secondary" href="/admin/kadromuz">Vazgeç</Link>
           </div>
         </form>
       </div>
-    </div>
+    </>
   );
 }

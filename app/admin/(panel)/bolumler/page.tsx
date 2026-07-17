@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { asc } from "drizzle-orm";
+import { Pencil } from "lucide-react";
 import { getDb, schema } from "@/lib/db/client";
+import { AdminPageHeader } from "../../AdminPageHeader";
 
 export default async function AdminDepartmentsPage({
   searchParams,
@@ -12,9 +14,12 @@ export default async function AdminDepartmentsPage({
   const rows = await db.select().from(schema.departments).orderBy(asc(schema.departments.sortOrder));
 
   return (
-    <div>
-      <h1>Bölümler</h1>
-      <p className="admin-page-desc">Okulda eğitim verilen 3 mesleki alanın içeriğini düzenleyin.</p>
+    <>
+      <AdminPageHeader
+        eyebrow="Akademik içerik"
+        title="Bölümler"
+        description="Okulda eğitim verilen üç mesleki alanın tanıtım metinlerini, bilgilerini ve görsellerini düzenleyin."
+      />
       {saved ? <div className="admin-flash">Kaydedildi.</div> : null}
       <div className="admin-card">
         <table>
@@ -32,7 +37,7 @@ export default async function AdminDepartmentsPage({
                 <td>{row.branch}</td>
                 <td className="admin-actions">
                   <Link className="admin-btn admin-btn-secondary" href={`/admin/bolumler/${row.id}`}>
-                    Düzenle
+                    <Pencil aria-hidden="true" size={15} /> Düzenle
                   </Link>
                 </td>
               </tr>
@@ -40,6 +45,6 @@ export default async function AdminDepartmentsPage({
           </tbody>
         </table>
       </div>
-    </div>
+    </>
   );
 }
