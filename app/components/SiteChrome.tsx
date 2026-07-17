@@ -5,6 +5,7 @@ import { DesktopNavigation } from "./DesktopNavigation";
 import { MobileNavigation } from "./MobileNavigation";
 import { siteNavigation } from "./navigation";
 import { ScrollAwareHeader } from "./ScrollAwareHeader";
+import { getSiteSettings } from "../../lib/content";
 
 export function SiteHeader() {
   return (
@@ -52,7 +53,11 @@ export function InstagramIcon() {
   );
 }
 
-export function SiteFooter() {
+export async function SiteFooter() {
+  const settings = await getSiteSettings();
+  const landlineTel = `tel:+9${settings.landlinePhone.replace(/\D/g, "")}`;
+  const whatsappHref = `https://wa.me/9${settings.whatsapp.replace(/\D/g, "")}`;
+
   return (
     <>
       <footer className="site-footer inner-footer">
@@ -63,8 +68,8 @@ export function SiteFooter() {
             </Link>
             <p>Meslek sahibi, gelecek sahibi.</p>
             <div className="inner-footer-social">
-              <a href="https://www.instagram.com/dinamikokullarisamsun" target="_blank" rel="noreferrer" aria-label="Instagram"><InstagramIcon /></a>
-              <a href="https://www.youtube.com/channel/UCmwV6um8k2UhRbSzQEhyM6g" target="_blank" rel="noreferrer" aria-label="YouTube"><Video size={18} /></a>
+              <a href={settings.instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram"><InstagramIcon /></a>
+              <a href={settings.youtubeUrl} target="_blank" rel="noreferrer" aria-label="YouTube"><Video size={18} /></a>
             </div>
           </div>
           <div className="footer-links">
@@ -83,9 +88,9 @@ export function SiteFooter() {
           </div>
           <address className="inner-footer-contact">
             <strong>İletişim</strong>
-            <a href="tel:+903624655353"><Phone size={15} />0362 465 53 53</a>
-            <a href="mailto:samsun@dinamikokullari.com"><Mail size={15} />samsun@dinamikokullari.com</a>
-            <Link href="/iletisim"><MapPin size={15} />Toybelen, İlkadım / Samsun</Link>
+            <a href={landlineTel}><Phone size={15} />{settings.landlinePhone}</a>
+            <a href={`mailto:${settings.email}`}><Mail size={15} />{settings.email}</a>
+            <Link href="/iletisim"><MapPin size={15} />{settings.addressLine}</Link>
           </address>
         </div>
         <div className="container footer-bottom">
@@ -95,7 +100,7 @@ export function SiteFooter() {
       </footer>
       <a
         className="floating-whatsapp"
-        href="https://wa.me/905467765060"
+        href={whatsappHref}
         target="_blank"
         rel="noreferrer"
         aria-label="WhatsApp üzerinden iletişime geçin"

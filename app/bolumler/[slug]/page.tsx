@@ -5,17 +5,18 @@ import { ArrowRight, CheckCircle2, Compass, Gauge, ShieldCheck } from "lucide-re
 import { notFound } from "next/navigation";
 import { InnerPageShell } from "../../components/SiteChrome";
 import { PageHero } from "../../components/PageHero";
-import { departments, getDepartment } from "../../data/departments";
+import { getDepartment, getDepartments } from "../../data/departments";
 
 type DepartmentPageProps = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const departments = await getDepartments();
   return departments.map((department) => ({ slug: department.slug }));
 }
 
 export async function generateMetadata({ params }: DepartmentPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const department = getDepartment(slug);
+  const department = await getDepartment(slug);
   if (!department) return {};
   return {
     title: department.title,
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: DepartmentPageProps): Promise
 
 export default async function DepartmentPage({ params }: DepartmentPageProps) {
   const { slug } = await params;
-  const department = getDepartment(slug);
+  const department = await getDepartment(slug);
   if (!department) notFound();
 
   return (

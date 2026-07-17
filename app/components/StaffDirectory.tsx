@@ -2,7 +2,7 @@
 
 import { Search, Users } from "lucide-react";
 import { useMemo, useState } from "react";
-import { staffGroups, staffMembers } from "../data/staff";
+import type { StaffGroup, StaffMember } from "../data/staff";
 
 const ALL = "Tümü";
 
@@ -11,7 +11,7 @@ function getInitials(name: string) {
   return `${parts[0]?.[0] ?? ""}${parts.at(-1)?.[0] ?? ""}`.toLocaleUpperCase("tr-TR");
 }
 
-export function StaffDirectory() {
+export function StaffDirectory({ staffGroups, staffMembers }: { staffGroups: StaffGroup[]; staffMembers: StaffMember[] }) {
   const [activeCategory, setActiveCategory] = useState(ALL);
   const [query, setQuery] = useState("");
 
@@ -24,7 +24,7 @@ export function StaffDirectory() {
         `${member.name} ${member.role}`.toLocaleLowerCase("tr-TR").includes(normalizedQuery);
       return matchesCategory && matchesQuery;
     });
-  }, [activeCategory, query]);
+  }, [activeCategory, query, staffMembers]);
 
   return (
     <div className="staff-directory">

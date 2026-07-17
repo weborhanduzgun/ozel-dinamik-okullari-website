@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated/local tooling output, not source code.
+    "dist/**",
+    "**/.wrangler/**",
+    "data/**",
   ]),
 ]);
 

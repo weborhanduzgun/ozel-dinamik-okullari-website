@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { InstagramIcon, SiteFooter, SiteHeader } from "./components/SiteChrome";
 import { RegistrationForm } from "./components/RegistrationForm";
+import { getDepartments } from "./data/departments";
+import { getGalleryImages, getSiteSettings } from "../lib/content";
 import {
   ArrowRight,
   Building2,
@@ -34,7 +36,6 @@ type LinkItem = {
 };
 
 type Department = {
-  id: string;
   slug: string;
   title: string;
   branch: string;
@@ -44,41 +45,33 @@ type Department = {
   accent: "teal" | "blue" | "green";
 };
 
-const departments: Department[] = [
-  {
-    id: "kimya",
+// Homepage teaser copy per department: the icon, accent color and short
+// blurb are a homepage-only design choice, distinct from the fuller profile
+// on the department detail page. Title/branch/image below are placeholders —
+// they're overwritten with the admin-managed values in Home() below.
+const departmentTeasers: Record<string, Omit<Department, "title" | "branch" | "image">> = {
+  "kimya-teknolojileri": {
     slug: "kimya-teknolojileri",
-    title: "Kimya Teknolojileri",
-    branch: "Kimya Laboratuvarı Dalı",
     description:
       "Numune alma, klasik ve cihazlı analizler ile güvenli laboratuvar uygulamalarını bir araya getiren mesleki eğitim.",
-    image: "/images/hero-lab.jpg",
     icon: FlaskConical,
     accent: "teal",
   },
-  {
-    id: "elektrik",
+  "elektrik-elektronik-teknolojileri": {
     slug: "elektrik-elektronik-teknolojileri",
-    title: "Elektrik-Elektronik Teknolojileri",
-    branch: "Elektrik Tesisatları ve Dağıtımı Dalı",
     description:
       "Devre, simülasyon, tesisat projesi, kuvvet-kumanda panoları ve test uygulamalarına odaklanan program.",
-    image: "/images/electronics.jpg",
     icon: CircuitBoard,
     accent: "blue",
   },
-  {
-    id: "biyomedikal",
+  "biyomedikal-cihaz-teknolojileri": {
     slug: "biyomedikal-cihaz-teknolojileri",
-    title: "Biyomedikal Cihaz Teknolojileri",
-    branch: "Tıbbi Görüntüleme Sistemleri Dalı",
     description:
       "Tıbbi cihazların kurulumu, kullanımı, bakım süreçleri ve sağlık teknolojilerinin teknik altyapısına yönelik eğitim.",
-    image: "/images/biomedical.jpg",
     icon: HeartPulse,
     accent: "green",
   },
-];
+};
 
 const benefits = [
   {
@@ -106,15 +99,6 @@ const benefits = [
     title: "1 Kampüs",
     text: "Eğitim, Spor ve Sosyal Yaşam",
   },
-];
-
-const gallery = [
-  { src: "/images/gallery-1.jpg", alt: "Dinamik öğrencilerinin kış etkinliği" },
-  { src: "/images/gallery-2.jpg", alt: "Öğrencilerin açık hava etkinliği" },
-  { src: "/images/gallery-3.jpg", alt: "Okulun kültürel gezi programı" },
-  { src: "/images/gallery-4.jpg", alt: "Dinamik öğrencileri sosyal etkinlikte" },
-  { src: "/images/gallery-7.jpg", alt: "Okul etkinliğine katılan öğrenciler" },
-  { src: "/images/gallery-8.jpg", alt: "Dinamik öğrenci topluluğu" },
 ];
 
 const quickLinks: LinkItem[] = [
@@ -179,7 +163,25 @@ function DepartmentCard({ department, index }: { department: Department; index: 
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const [canonicalDepartments, galleryImages, settings] = await Promise.all([
+    getDepartments(),
+    getGalleryImages(),
+    getSiteSettings(),
+  ]);
+  const departments: Department[] = canonicalDepartments
+    .filter((department) => department.slug in departmentTeasers)
+    .map((department) => ({
+      ...departmentTeasers[department.slug],
+      title: department.title,
+      branch: department.branch,
+      image: department.image,
+    }));
+  const gallery = galleryImages.slice(0, 6);
+  const generalPhoneTel = `tel:+9${settings.generalPhone.replace(/\D/g, "")}`;
+  const landlineTel = `tel:+9${settings.landlinePhone.replace(/\D/g, "")}`;
+  const whatsappHref = `https://wa.me/9${settings.whatsapp.replace(/\D/g, "")}`;
+
   return (
     <div className="site-shell">
       <a className="skip-link" href="#main-content">
@@ -225,7 +227,7 @@ export default function Home() {
               <aside className="hero-rail" aria-label="Okuldan öne çıkanlar">
                 <a
                   className="hero-tile hero-tile--large"
-                  href="https://www.youtube.com/channel/UCmwV6um8k2UhRbSzQEhyM6g"
+                  href={settings.youtubeUrl}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -314,7 +316,7 @@ export default function Home() {
               />
               <div className="department-grid">
                 {departments.map((department, index) => (
-                  <DepartmentCard key={department.id} department={department} index={index} />
+                  <DepartmentCard key={department.slug} department={department} index={index} />
                 ))}
               </div>
               <Link className="departments-footer-link" href="/bolumler">
@@ -333,7 +335,7 @@ export default function Home() {
               <p className="gallery-description">Eğitim sadece sınıfta değil, hayatın her anında.</p>
               <a
                 className="button button--secondary button--small"
-                href="https://www.instagram.com/dinamikokullarisamsun"
+                href={settings.instagramUrl}
                 target="_blank"
                 rel="noreferrer"
               >
@@ -568,13 +570,13 @@ export default function Home() {
                 okulumuza ulaşın.
               </p>
               <div className="contact-actions">
-                <a className="button button--light" href="tel:+908502182806">
+                <a className="button button--light" href={generalPhoneTel}>
                   <Phone size={17} aria-hidden="true" />
-                  0850 218 28 06
+                  {settings.generalPhone}
                 </a>
                 <a
                   className="button button--whatsapp"
-                  href="https://wa.me/905467765060"
+                  href={whatsappHref}
                   target="_blank"
                   rel="noreferrer"
                 >
@@ -586,22 +588,22 @@ export default function Home() {
 
             <address className="contact-card">
               <a
-                href="https://www.google.com/maps/search/?api=1&query=Toybelen+Mahallesi+Anadolu+Bulvar%C4%B1+No%3A225+%C4%B0lkad%C4%B1m+Samsun"
+                href={settings.mapUrl}
                 target="_blank"
                 rel="noreferrer"
               >
                 <span className="contact-card-icon"><MapPin size={21} aria-hidden="true" /></span>
-                <span><small>Adres</small><strong>Toybelen Mah. Anadolu Bulvarı No:225<br />İlkadım / Samsun</strong></span>
+                <span><small>Adres</small><strong>{settings.addressLine}</strong></span>
                 <ExternalLink size={15} aria-hidden="true" />
               </a>
-              <a href="tel:+903624655353">
+              <a href={landlineTel}>
                 <span className="contact-card-icon"><Phone size={21} aria-hidden="true" /></span>
-                <span><small>Sabit Hat</small><strong>0362 465 53 53</strong></span>
+                <span><small>Sabit Hat</small><strong>{settings.landlinePhone}</strong></span>
                 <ChevronRight size={15} aria-hidden="true" />
               </a>
               <div>
                 <span className="contact-card-icon"><Clock3 size={21} aria-hidden="true" /></span>
-                <span><small>Çalışma Saatleri</small><strong>Pazartesi – Cumartesi<br />08:30 – 18:00</strong></span>
+                <span><small>Çalışma Saatleri</small><strong>{settings.hours}</strong></span>
               </div>
             </address>
           </div>

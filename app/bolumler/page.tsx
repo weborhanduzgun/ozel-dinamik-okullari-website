@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, BookOpenCheck, BriefcaseBusiness, GraduationCap } from "lucide-react";
 import { InnerPageShell } from "../components/SiteChrome";
 import { PageHero } from "../components/PageHero";
-import { departments } from "../data/departments";
+import { getDepartments } from "../data/departments";
 
 export const metadata: Metadata = {
   title: "Bölümlerimiz",
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/bolumler" },
 };
 
-export default function DepartmentsPage() {
+export default async function DepartmentsPage() {
+  const departments = await getDepartments();
   return (
     <InnerPageShell>
       <PageHero

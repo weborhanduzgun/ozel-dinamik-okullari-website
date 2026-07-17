@@ -1,22 +1,54 @@
 import assert from "node:assert/strict";
 import { access, readFile } from "node:fs/promises";
-import test from "node:test";
+import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
+import { after, before, test } from "node:test";
+
+const PORT = 4173;
+const BASE_URL = `http://127.0.0.1:${PORT}`;
+const nextBin = createRequire(import.meta.url).resolve("next/dist/bin/next");
+
+let serverProcess;
+
+async function waitForServer(timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(BASE_URL);
+      if (response.ok) return;
+    } catch {
+      // Server not ready yet — keep polling.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+  throw new Error(`Server did not become ready on ${BASE_URL} within ${timeoutMs}ms`);
+}
+
+before(async () => {
+  // Spawn the `next` binary directly (no shell/npx wrapper) so `.kill()` in
+  // the `after` hook terminates the real process instead of an orphaned child.
+  serverProcess = spawn(process.execPath, [nextBin, "start", "-p", String(PORT)], {
+    cwd: new URL("..", import.meta.url),
+    stdio: "pipe",
+  });
+  await waitForServer(30000);
+});
+
+after(() => {
+  serverProcess?.kill();
+});
 
 async function render() {
-  const html = await readFile(new URL("../out/index.html", import.meta.url), "utf8");
-
-  return new Response(html, {
-    status: 200,
-    headers: { "content-type": "text/html; charset=utf-8" },
-  });
+  return fetch(BASE_URL);
 }
 
 async function readRoute(route) {
-  const relativePath = route === "/" ? "../out/index.html" : `../out${route}.html`;
-  return readFile(new URL(relativePath, import.meta.url), "utf8");
+  const response = await fetch(`${BASE_URL}${route}`);
+  assert.equal(response.status, 200, `${route} should respond with 200`);
+  return response.text();
 }
 
-test("renders the completed Turkish school homepage in the static export", async () => {
+test("renders the completed Turkish school homepage", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -29,7 +61,7 @@ test("renders the completed Turkish school homepage in the static export", async
   assert.match(html, /Elektrik-Elektronik Teknolojileri/);
   assert.match(html, /Biyomedikal Cihaz Teknolojileri/);
   assert.match(html, /Ön Kayıt Talebi/);
-  assert.match(html, /Toybelen Mah\. Anadolu Bulvarı No:225/);
+  assert.match(html, /Toybelen Mahallesi Anadolu Bulvarı No:225/);
   assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
 });
 
@@ -49,7 +81,6 @@ test("keeps essential navigation and accessibility contracts", async () => {
     /Galeri[\s\S]*Sosyal, Kültürel ve Sportif Çalışmalar/i,
   );
   assert.match(html, /href="\/galeri"[^>]*>\s*Galeri/i);
-  assert.match(html, /href="\/haberler"[^>]*>\s*Haberler/i);
   assert.match(html, /href="\/kadromuz"/i);
   assert.match(html, /href="\/basarilarimiz"/i);
   assert.match(html, /aria-label="Hızlı erişim"/i);
@@ -57,6 +88,7 @@ test("keeps essential navigation and accessibility contracts", async () => {
   assert.match(html, /href="tel:\+908502182806"/i);
   assert.match(html, /href="tel:\+903624655353"/i);
   assert.match(html, /aria-expanded="false"/i);
+  assert.doesNotMatch(html, /href="\/haberler"|>\s*Yayınlar\s*</i, "Yayınlar/Haberler was intentionally removed");
 });
 
 test("exports every primary frontend route with working internal navigation", async () => {
@@ -72,7 +104,6 @@ test("exports every primary frontend route with working internal navigation", as
     "/faaliyetlerimiz",
     "/galeri",
     "/basarilarimiz",
-    "/haberler",
     "/rehberlik",
     "/iletisim",
     "/on-kayit",
@@ -84,6 +115,13 @@ test("exports every primary frontend route with working internal navigation", as
     assert.match(html, /aria-label="Ana navigasyon"/i, `${route} needs shared navigation`);
     assert.match(html, /Dinamik Okulları/i, `${route} needs the school brand`);
   }
+});
+
+test("redirects unauthenticated admin requests to the login page", async () => {
+  const response = await fetch(`${BASE_URL}/admin`, { redirect: "manual" });
+  assert.ok([307, 308, 302].includes(response.status), "unauthenticated /admin should redirect");
+  const location = response.headers.get("location") ?? "";
+  assert.match(location, /\/admin\/login$/);
 });
 
 test("publishes only the three active branches from the provided program reference", async () => {
@@ -109,7 +147,6 @@ test("renders the cinematic homepage composition while preserving the brand logo
   assert.match(html, /src="\/images\/footer-logo-dinamik\.png"/i);
   assert.match(html, /class="hero"/i);
   assert.doesNotMatch(html, /class="stats-section"/i);
-  assert.match(html, /id="news-title"[^>]*>Haberler &amp; Duyurular</i);
   assert.match(html, /class="departments-footer-link"/i);
   assert.match(html, /class="hero-rail"/i);
   assert.equal((html.match(/class="hero-tile(?: hero-tile--large)?"/gi) ?? []).length, 3);

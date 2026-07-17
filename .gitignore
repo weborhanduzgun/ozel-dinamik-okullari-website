@@ -36,7 +36,13 @@ yarn-error.log*
 
 # typescript
 next-env.d.ts
+*.tsbuildinfo
 /dist/
 /.wrangler/
 /outputs/
 /work/
+
+# admin panel local database and uploaded media
+/data/
+/public/uploads/*
+!/public/uploads/.gitkeep

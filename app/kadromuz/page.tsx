@@ -3,7 +3,7 @@ import { GraduationCap, HeartHandshake, Sparkles } from "lucide-react";
 import { InnerPageShell } from "../components/SiteChrome";
 import { PageHero } from "../components/PageHero";
 import { StaffDirectory } from "../components/StaffDirectory";
-import { staffGroups, staffMembers } from "../data/staff";
+import { getStaffGroups, getStaffMembers } from "../data/staff";
 
 export const metadata: Metadata = {
   title: "Kadromuz",
@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/kadromuz" },
 };
 
-export default function StaffPage() {
+export default async function StaffPage() {
+  const [staffGroups, staffMembers] = await Promise.all([getStaffGroups(), getStaffMembers()]);
   return (
     <InnerPageShell>
       <PageHero eyebrow="Uzmanlık, deneyim, iş birliği" title="Her öğrencinin potansiyeline inanan güçlü bir eğitim ekibi." description="Mesleki alan öğretmenlerinden akademik branşlara, rehberlikten sanat ve spora uzanan çok yönlü bir kadro." image="/images/gallery-3.jpg" current="Kadromuz" />
@@ -24,7 +25,7 @@ export default function StaffPage() {
             <div><strong>3</strong><small>mesleki alan ekibi</small></div>
             <div><strong>1</strong><small>ortak eğitim kültürü</small></div>
           </div>
-          <StaffDirectory />
+          <StaffDirectory staffGroups={staffGroups} staffMembers={staffMembers} />
         </div>
       </section>
       <section className="inner-section">
