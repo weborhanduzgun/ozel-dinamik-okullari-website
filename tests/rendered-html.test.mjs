@@ -88,6 +88,11 @@ test("keeps essential navigation and accessibility contracts", async () => {
   assert.match(html, /href="tel:\+908502182806"/i);
   assert.match(html, /href="tel:\+903624655353"/i);
   assert.match(html, /aria-expanded="false"/i);
+  assert.match(
+    html,
+    /<button[^>]*class="mobile-submenu-trigger"[^>]*aria-label="Bölümler alt menüsünü aç"[^>]*>[\s\S]*?<span>Bölümler<\/span>/i,
+  );
+  assert.doesNotMatch(html, /class="mobile-navigation-parent"/i);
   assert.doesNotMatch(html, /href="\/haberler"|>\s*Yayınlar\s*</i, "Yayınlar/Haberler was intentionally removed");
 });
 
@@ -118,6 +123,19 @@ test("exports every primary frontend route with working internal navigation", as
   }
 });
 
+test("keeps every teaching branch separate in the staff directory", async () => {
+  const html = await readRoute("/kadromuz");
+
+  for (const branch of ["Fizik", "Biyoloji", "Tarih", "Coğrafya", "Felsefe", "Beden Eğitimi ve Spor", "Müzik", "Görsel Sanatlar"]) {
+    assert.match(html, new RegExp(`>${branch}<`, "i"), `${branch} needs its own staff filter`);
+  }
+
+  assert.match(html, /Kader Danışmaz[\s\S]*Tarih Öğretmeni/i);
+  assert.match(html, /Fatma Zehra Soruklu[\s\S]*Coğrafya Öğretmeni/i);
+  assert.match(html, /Betül Müdür[\s\S]*Felsefe Öğretmeni/i);
+  assert.doesNotMatch(html, /Sosyal Bilimler|Fen Bilimleri|Spor ve Sanat/i);
+});
+
 test("publishes a clear KVKK notice and separates optional WhatsApp preference", async () => {
   const [kvkkHtml, registrationHtml] = await Promise.all([
     readRoute("/kvkk"),
@@ -141,19 +159,56 @@ test("redirects unauthenticated admin requests to the login page", async () => {
   assert.match(location, /\/admin\/login$/);
 });
 
-test("publishes only the three active branches from the provided program reference", async () => {
-  const pages = await Promise.all([
+test("labels active and unavailable branches according to the provided program reference", async () => {
+  const [departmentsHtml, chemistryHtml, electronicsHtml, biomedicalHtml] = await Promise.all([
     readRoute("/bolumler"),
     readRoute("/bolumler/kimya-teknolojileri"),
     readRoute("/bolumler/elektrik-elektronik-teknolojileri"),
     readRoute("/bolumler/biyomedikal-cihaz-teknolojileri"),
   ]);
-  const html = pages.join("\n");
+  const html = [departmentsHtml, chemistryHtml, electronicsHtml, biomedicalHtml].join("\n");
 
   assert.match(html, /Kimya Laboratuvarı Dalı/i);
   assert.match(html, /Elektrik Tesisatları ve Dağıtımı Dalı/i);
   assert.match(html, /Tıbbi Görüntüleme Sistemleri Dalı/i);
-  assert.doesNotMatch(html, /Petrol Endüstrisi|Asansör Sistemleri|Yaşam Destek ve Tedavi Cihazları/i);
+  assert.match(chemistryHtml, /Petrol Endüstrisi,[\s\S]*Okulumuzda bu dalda eğitim VERİLMEMEKTEDİR/i);
+  assert.match(chemistryHtml, /Proses[\s\S]*Okulumuzda bu dalda eğitim VERİLMEMEKTEDİR/i);
+  assert.match(chemistryHtml, /Sektörün ihtiyaçları doğrultusunda bilimsel ve teknolojik gelişmelere paralel mesleki yeterlikleri kazanan/i);
+  assert.match(chemistryHtml, /Ultraviyole spektrofotometresi,[\s\S]*kromatografik yöntemleri kullanarak numunelerde analiz yapma/i);
+  assert.match(chemistryHtml, /Alan programının toplam eğitim süresi 4 öğretim yılı olarak planlanmıştır/i);
+  assert.doesNotMatch(chemistryHtml, /Teknik bilgiyi güvenli, dikkatli ve üretken bir çalışma kültürüne dönüştür/i);
+  assert.ok((chemistryHtml.match(/department-branch-card is-unavailable/g) ?? []).length >= 2);
+
+  for (const unavailableBranch of [
+    "Asansör Sistemleri",
+    "Elektrikli Cihazlar Teknik Servisi",
+    "Elektronik ve Haberleşme",
+    "Endüstriyel Bakım Onarım",
+    "Savunma Elektronik Sistemleri",
+  ]) {
+    assert.match(electronicsHtml, new RegExp(`${unavailableBranch}[\\s\\S]*Okulumuzda bu dalda eğitim VERİLMEMEKTEDİR`, "i"));
+  }
+  assert.match(electronicsHtml, /Elektrik-elektronik sanayisi, küresel düzeyde hızla değişen pazar ve rekabet koşulları/i);
+  assert.match(electronicsHtml, /Elektrik İç Tesisleri Yönetmeliği'ne,[\s\S]*kontrol panolarını hazırlama/i);
+  assert.match(electronicsHtml, /İş sağlığı ve güvenliği tedbirlerini alarak test uygulamaları yapma ile ilgili bilgi, beceri ve yetkinliklerin kazandırılması amaçlanmaktadır/i);
+  assert.match(electronicsHtml, /Alan programının toplam eğitim süresi 4 öğretim yılı olarak planlanmıştır/i);
+  assert.doesNotMatch(electronicsHtml, /Teknik bilgiyi güvenli, dikkatli ve üretken bir çalışma kültürüne dönüştür/i);
+  assert.ok((electronicsHtml.match(/department-branch-card is-unavailable/g) ?? []).length >= 5);
+
+  for (const unavailableBranch of [
+    "Yaşam Destek ve Tedavi Cihazları",
+    "Tıbbi Laboratuvar ve Hasta Dışı Uygulama Cihazları",
+    "Fizyolojik Sinyal İzleme Teşhis ve Kayıt Cihazları",
+  ]) {
+    assert.match(biomedicalHtml, new RegExp(`${unavailableBranch}[\\s\\S]*Okulumuzda bu dalda eğitim VERİLMEMEKTEDİR`, "i"));
+  }
+  assert.match(biomedicalHtml, /Biyomedikal Cihaz Teknolojileri Alanı altında yer alan dallarda,makine ve cihazların/i);
+  assert.match(biomedicalHtml, /Tıbbî görüntüleme cihazlarına ilişkin kurulum şartlarını kontrol etme/i);
+  assert.match(biomedicalHtml, /Ultrasonik görüntüleyicilerin,[\s\S]*kalibrasyon ve ayarlarını kontrol etmek/i);
+  assert.match(biomedicalHtml, /Sabırlı, dikkatli, tedbirli ve titiz,[\s\S]*sorumluluk duygusu gelişmiş kişiler olması da gereklidir/i);
+  assert.ok((biomedicalHtml.match(/department-branch-card is-unavailable/g) ?? []).length >= 3);
+
+  assert.doesNotMatch(departmentsHtml, /Petrol Endüstrisi|Asansör Sistemleri|Yaşam Destek ve Tedavi Cihazları/i);
 });
 
 test("renders the cinematic homepage composition while preserving the brand logos", async () => {

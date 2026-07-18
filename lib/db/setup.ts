@@ -97,6 +97,7 @@ type DepartmentSeed = {
   skills: unknown;
   learningAreas: unknown;
   careerAreas: unknown;
+  contentBlocks?: unknown;
 };
 type StaffGroupSeed = { category: string; role: string; names: string[] };
 type GalleryImageSeed = { src: string; alt: string; caption?: string };
@@ -190,8 +191,8 @@ export function ensureHomepageSections(db: DatabaseSync): void {
 export function seedInitialContent(db: DatabaseSync): void {
   const departments = readJson<DepartmentSeed[]>("departments.json");
   const insertDepartment = db.prepare(
-    `INSERT INTO departments (slug, short_title, title, branch, image, accent, lead, purpose, facts, skills, learning_areas, career_areas, sort_order)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO departments (slug, short_title, title, branch, image, accent, lead, purpose, facts, skills, learning_areas, career_areas, content_blocks, sort_order)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   );
   departments.forEach((department, index) => {
     insertDepartment.run(
@@ -207,6 +208,7 @@ export function seedInitialContent(db: DatabaseSync): void {
       JSON.stringify(department.skills),
       JSON.stringify(department.learningAreas),
       JSON.stringify(department.careerAreas),
+      department.contentBlocks ? JSON.stringify(department.contentBlocks) : null,
       index,
     );
   });

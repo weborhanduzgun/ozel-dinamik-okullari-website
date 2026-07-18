@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Compass, Gauge, ShieldCheck } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleX, Compass, Gauge, ShieldCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { InnerPageShell } from "../../components/SiteChrome";
 import { PageHero } from "../../components/PageHero";
@@ -31,6 +31,30 @@ function DepartmentContentBlockView({ block, isFirst }: { block: DepartmentConte
     );
   }
 
+  if (block.type === "branch-list") {
+    const branches = linesToList(block.content);
+    return (
+      <section className={`department-branch-section department-content-block${isFirst ? " is-first" : ""}`} aria-labelledby={headingId}>
+        <div className="container">
+          <div className="department-block-heading"><p className="inner-eyebrow">Alan programı</p><h2 id={headingId}>{block.title}</h2></div>
+          {block.footer ? <p className="department-branch-intro">{block.footer}</p> : null}
+          <div className={`department-branch-grid${branches.length === 4 ? " department-branch-grid--four" : ""}`} role="list">
+            {branches.map((branch, index) => {
+              const unavailable = branch.includes("VERİLMEMEKTEDİR");
+              const Icon = unavailable ? CircleX : CheckCircle2;
+              return (
+                <article className={`department-branch-card${unavailable ? " is-unavailable" : " is-active"}`} key={`${block.id}-${index}`} role="listitem">
+                  <span className="department-branch-icon"><Icon size={22} aria-hidden="true" /></span>
+                  <span><small>{unavailable ? "Okulumuzda eğitim verilmeyen dal" : "Okulumuzda eğitim verilen dal"}</small><strong>{branch}</strong></span>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (block.type === "skills") {
     return (
       <section className="inner-section department-content-block" aria-labelledby={headingId}>
@@ -39,6 +63,7 @@ function DepartmentContentBlockView({ block, isFirst }: { block: DepartmentConte
           <ul className="check-list-grid">
             {linesToList(block.content).map((skill, index) => <li key={`${block.id}-${index}`}><CheckCircle2 size={17} aria-hidden="true" />{skill}</li>)}
           </ul>
+          {block.footer ? <p className="department-list-footer">{block.footer}</p> : null}
         </div>
       </section>
     );
@@ -75,6 +100,17 @@ function DepartmentContentBlockView({ block, isFirst }: { block: DepartmentConte
     );
   }
 
+  if (block.type === "highlight") {
+    return (
+      <section className="inner-section department-content-block department-highlight-section" aria-labelledby={headingId}>
+        <div className="container department-highlight-card">
+          <span className="department-highlight-icon"><Gauge size={26} aria-hidden="true" /></span>
+          <div><p className="inner-eyebrow">Program bilgisi</p><h2 id={headingId}>{block.title}</h2><p>{block.content}</p></div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="inner-section department-content-block" aria-labelledby={headingId}>
       <div className="container department-text-block">
@@ -105,37 +141,50 @@ export default async function DepartmentPage({ params }: DepartmentPageProps) {
   const { slug } = await params;
   const department = await getDepartment(slug);
   if (!department) notFound();
+  const hasDetailedProgramContent = department.contentBlocks.some((block) => block.type === "branch-list");
+  const heroIntroBlock = department.contentBlocks[0]?.id === "field-purpose" && department.contentBlocks[0].type === "text"
+    ? department.contentBlocks[0]
+    : undefined;
+  const visibleContentBlocks = heroIntroBlock ? department.contentBlocks.slice(1) : department.contentBlocks;
 
   return (
     <InnerPageShell>
-      <PageHero eyebrow={department.branch} title={department.title} description={department.lead} image={department.image} current={department.shortTitle} accent={department.accent} />
+      <PageHero eyebrow={heroIntroBlock?.title ?? department.branch} title={department.title} description={heroIntroBlock?.content ?? department.lead} image={department.image} current={department.shortTitle} accent={department.accent} />
 
-      {department.contentBlocks[0]?.type === "info-cards" ? <DepartmentContentBlockView block={department.contentBlocks[0]} isFirst /> : null}
-
-      <section className="inner-section">
-        <div className="container editorial-grid">
-          <div className="editorial-visual">
-            <div className="image-frame"><Image src={department.image} alt={`${department.title} uygulamalı eğitim ortamı`} fill sizes="(max-width: 900px) calc(100vw - 48px), 46vw" /></div>
-            <span className="image-frame-accent" aria-hidden="true" />
-          </div>
-          <div className="editorial-copy">
-            <p className="inner-eyebrow">Programın amacı</p>
-            <h2>Teknik bilgiyi güvenli, dikkatli ve üretken bir çalışma kültürüne dönüştür.</h2>
-            <p>{department.purpose}</p>
-          </div>
+      {hasDetailedProgramContent ? (
+        <div className="department-program-flow">
+          {visibleContentBlocks.map((block, index) => <DepartmentContentBlockView block={block} isFirst={index === 0} key={block.id} />)}
         </div>
-      </section>
+      ) : (
+        <>
+          {department.contentBlocks[0]?.type === "info-cards" ? <DepartmentContentBlockView block={department.contentBlocks[0]} isFirst /> : null}
 
-      {department.contentBlocks.map((block, index) => (
-        index === 0 && block.type === "info-cards" ? null : <DepartmentContentBlockView block={block} isFirst={false} key={block.id} />
-      ))}
+          <section className="inner-section">
+            <div className="container editorial-grid">
+              <div className="editorial-visual">
+                <div className="image-frame"><Image src={department.image} alt={`${department.title} uygulamalı eğitim ortamı`} fill sizes="(max-width: 900px) calc(100vw - 48px), 46vw" /></div>
+                <span className="image-frame-accent" aria-hidden="true" />
+              </div>
+              <div className="editorial-copy">
+                <p className="inner-eyebrow">Programın amacı</p>
+                <h2>Teknik bilgiyi güvenli, dikkatli ve üretken bir çalışma kültürüne dönüştür.</h2>
+                <p>{department.purpose}</p>
+              </div>
+            </div>
+          </section>
 
-      <section className="inner-section">
-        <div className="container cta-panel">
-          <div><h2>{department.shortTitle} programını yerinde keşfet.</h2><p>Atölyeleri görmek, programla ilgili sorularını sormak ve kayıt sürecini öğrenmek için okulumuza ulaş.</p></div>
-          <div className="cta-panel-actions"><Link className="button button--primary" href="/on-kayit">Ön kayıt <ArrowRight size={16} /></Link><Link className="button button--outline-light" href="/bolumler">Diğer bölümler</Link></div>
-        </div>
-      </section>
+          {department.contentBlocks.map((block, index) => (
+            index === 0 && block.type === "info-cards" ? null : <DepartmentContentBlockView block={block} isFirst={false} key={block.id} />
+          ))}
+
+          <section className="inner-section">
+            <div className="container cta-panel">
+              <div><h2>{department.shortTitle} programını yerinde keşfet.</h2><p>Atölyeleri görmek, programla ilgili sorularını sormak ve kayıt sürecini öğrenmek için okulumuza ulaş.</p></div>
+              <div className="cta-panel-actions"><Link className="button button--primary" href="/on-kayit">Ön kayıt <ArrowRight size={16} /></Link><Link className="button button--outline-light" href="/bolumler">Diğer bölümler</Link></div>
+            </div>
+          </section>
+        </>
+      )}
     </InnerPageShell>
   );
 }

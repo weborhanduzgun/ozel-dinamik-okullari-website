@@ -6,6 +6,7 @@ import {
   ArrowUp,
   BriefcaseBusiness,
   CheckSquare2,
+  CircleAlert,
   FileText,
   LayoutGrid,
   Plus,
@@ -19,18 +20,22 @@ import {
 
 const BLOCK_ICONS = {
   "info-cards": LayoutGrid,
+  "branch-list": CircleAlert,
   skills: CheckSquare2,
   "learning-cards": LayoutGrid,
   "career-tags": BriefcaseBusiness,
   text: FileText,
+  highlight: CircleAlert,
 } satisfies Record<DepartmentContentBlockType, typeof LayoutGrid>;
 
 const BLOCK_HINTS: Record<DepartmentContentBlockType, string> = {
   "info-cards": "Her satır: Etiket | Değer. Üç bilgi kartı önerilir.",
+  "branch-list": "Her satıra bir dal yazın. Eğitim verilmeyen dalların açıklamasını aynı satırda eksiksiz koruyun.",
   skills: "Her satıra bir beceri yazın.",
   "learning-cards": "Her satır: Kart başlığı | Kart açıklaması.",
   "career-tags": "Her satıra bir kariyer veya devam eğitimi alanı yazın.",
   text: "Her satır ziyaretçi sayfasında ayrı bir paragraf olarak gösterilir.",
+  highlight: "Tek bir önemli bilgi veya kısa açıklama yazın.",
 };
 
 function createBlock(type: DepartmentContentBlockType): DepartmentContentBlock {
@@ -49,7 +54,7 @@ export function DepartmentBlocksEditor({ initialBlocks }: { initialBlocks: Depar
   const [selectedType, setSelectedType] = useState<DepartmentContentBlockType>("info-cards");
   const selectedOption = DEPARTMENT_BLOCK_OPTIONS.find((option) => option.value === selectedType)!;
 
-  function updateBlock(id: string, field: "title" | "content", value: string): void {
+  function updateBlock(id: string, field: "title" | "content" | "footer", value: string): void {
     setBlocks((current) => current.map((block) => block.id === id ? { ...block, [field]: value } : block));
   }
 
@@ -109,6 +114,7 @@ export function DepartmentBlocksEditor({ initialBlocks }: { initialBlocks: Depar
               <article className={`admin-block-card admin-block-card--${block.type}`} key={block.id}>
                 <input type="hidden" name="blockId" value={block.id} />
                 <input type="hidden" name="blockType" value={block.type} />
+                {block.type !== "skills" && block.type !== "branch-list" ? <input type="hidden" name="blockFooter" value={block.footer ?? ""} /> : null}
                 <header className="admin-block-card-header">
                   <div className="admin-block-card-type">
                     <span><Icon aria-hidden="true" size={17} /></span>
@@ -130,6 +136,19 @@ export function DepartmentBlocksEditor({ initialBlocks }: { initialBlocks: Depar
                     <span className="admin-hint">{BLOCK_HINTS[block.type]}</span>
                     <textarea name="blockContent" value={block.content} onChange={(event) => updateBlock(block.id, "content", event.target.value)} required />
                   </label>
+                  {block.type === "skills" ? (
+                    <label className="admin-block-footer-field">
+                      Liste sonrası açıklama <span className="admin-optional">(isteğe bağlı)</span>
+                      <span className="admin-hint">Maddelerin ardından gösterilecek tamamlayıcı cümleyi yazın.</span>
+                      <textarea name="blockFooter" value={block.footer ?? ""} onChange={(event) => updateBlock(block.id, "footer", event.target.value)} />
+                    </label>
+                  ) : block.type === "branch-list" ? (
+                    <label className="admin-block-footer-field">
+                      Liste giriş metni <span className="admin-optional">(isteğe bağlı)</span>
+                      <span className="admin-hint">Dal kartlarından önce gösterilecek kısa açıklamayı yazın.</span>
+                      <textarea name="blockFooter" value={block.footer ?? ""} onChange={(event) => updateBlock(block.id, "footer", event.target.value)} />
+                    </label>
+                  ) : null}
                 </div>
               </article>
             );
