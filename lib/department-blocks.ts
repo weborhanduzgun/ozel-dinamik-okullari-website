@@ -9,10 +9,12 @@ import {
 
 export const DEPARTMENT_BLOCK_TYPES = [
   "info-cards",
+  "branch-list",
   "skills",
   "learning-cards",
   "career-tags",
   "text",
+  "highlight",
 ] as const;
 
 export type DepartmentContentBlockType = (typeof DEPARTMENT_BLOCK_TYPES)[number];
@@ -22,6 +24,7 @@ export type DepartmentContentBlock = {
   type: DepartmentContentBlockType;
   title: string;
   content: string;
+  footer?: string;
 };
 
 export const DEPARTMENT_BLOCK_OPTIONS: Array<{
@@ -37,6 +40,13 @@ export const DEPARTMENT_BLOCK_OPTIONS: Array<{
     description: "Etiket ve değerlerden oluşan öne çıkan bilgi kartları.",
     defaultTitle: "Öne çıkan bilgiler",
     defaultContent: "Bilgi etiketi | Bilgi değeri",
+  },
+  {
+    value: "branch-list",
+    label: "Dal durumları",
+    description: "Programdaki dalları ve okulda eğitim verilip verilmediğini açık biçimde gösterir.",
+    defaultTitle: "Programda yer alan dallar",
+    defaultContent: "Dal adı\nDal adı (Okulumuzda bu dalda eğitim VERİLMEMEKTEDİR)",
   },
   {
     value: "skills",
@@ -65,6 +75,13 @@ export const DEPARTMENT_BLOCK_OPTIONS: Array<{
     description: "Serbest başlık ve paragraf metni ekler.",
     defaultTitle: "Bilgiler",
     defaultContent: "Bu alana ziyaretçilere gösterilecek bilgi metnini yazın.",
+  },
+  {
+    value: "highlight",
+    label: "Vurgulu bilgi",
+    description: "Eğitim süresi gibi önemli bir bilgiyi geniş bir vurgu kartında gösterir.",
+    defaultTitle: "Önemli bilgi",
+    defaultContent: "Vurgulanacak bilgi metni",
   },
 ];
 
@@ -118,12 +135,14 @@ export function normalizeDepartmentBlocks(
     if (!isDepartmentBlockType(block.type)) return [];
     const title = String(block.title ?? "").trim();
     const content = String(block.content ?? "").trim();
+    const footer = String(block.footer ?? "").trim();
     if (!title || !content) return [];
     return [{
       id: String(block.id ?? `block-${index + 1}`),
       type: block.type,
       title,
       content,
+      footer: footer || undefined,
     }];
   });
 }
@@ -133,8 +152,9 @@ export function parseDepartmentBlocksFromForm(formData: FormData): DepartmentCon
   const types = formData.getAll("blockType");
   const titles = formData.getAll("blockTitle");
   const contents = formData.getAll("blockContent");
+  const footers = formData.getAll("blockFooter");
 
-  if (new Set([ids.length, types.length, titles.length, contents.length]).size !== 1) {
+  if (new Set([ids.length, types.length, titles.length, contents.length, footers.length]).size !== 1) {
     throw new Error("Bölüm kısımları eksik veya geçersiz gönderildi.");
   }
 
@@ -143,12 +163,14 @@ export function parseDepartmentBlocksFromForm(formData: FormData): DepartmentCon
     if (!isDepartmentBlockType(type)) throw new Error("Geçersiz bölüm kısmı türü.");
     const title = String(titles[index] ?? "").trim();
     const content = String(contents[index] ?? "").trim();
+    const footer = String(footers[index] ?? "").trim();
     if (!title || !content) throw new Error("Eklenen her kısmın başlığı ve içeriği doldurulmalıdır.");
     return {
       id: String(ids[index] ?? "").trim() || `block-${Date.now()}-${index}`,
       type,
       title,
       content,
+      footer: footer || undefined,
     };
   });
 }

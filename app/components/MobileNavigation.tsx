@@ -63,23 +63,18 @@ export function MobileNavigation({ navigation, ctaHref = "#on-kayit" }: MobileNa
 
           return (
             <div className="mobile-navigation-group" key={item.label}>
-              <div className="mobile-navigation-heading">
-                <Link className="mobile-navigation-parent" href={item.href} onClick={closeMenu}>
-                  {item.label}
-                  <ChevronRight size={16} aria-hidden="true" />
-                </Link>
-                <button
-                  className="mobile-submenu-trigger"
-                  type="button"
-                  aria-label={`${item.label} alt menüsünü ${isSubmenuOpen ? "kapat" : "aç"}`}
-                  aria-expanded={isSubmenuOpen}
-                  aria-controls={submenuId}
-                  aria-haspopup="true"
-                  onClick={() => setOpenSubmenu(isSubmenuOpen ? null : item.label)}
-                >
-                  <ChevronDown size={16} aria-hidden="true" />
-                </button>
-              </div>
+              <button
+                className="mobile-submenu-trigger"
+                type="button"
+                aria-label={`${item.label} alt menüsünü ${isSubmenuOpen ? "kapat" : "aç"}`}
+                aria-expanded={isSubmenuOpen}
+                aria-controls={submenuId}
+                aria-haspopup="true"
+                onClick={() => setOpenSubmenu(isSubmenuOpen ? null : item.label)}
+              >
+                <span>{item.label}</span>
+                <ChevronDown size={16} aria-hidden="true" />
+              </button>
               <div className="mobile-submenu" id={submenuId} hidden={!isSubmenuOpen}>
                 {item.children.map((child) => (
                   <Link key={child.href} href={child.href} onClick={closeMenu}>

@@ -504,6 +504,8 @@
 .admin-block-card--skills .admin-block-card-type > span { background: var(--admin-red-soft); color: var(--admin-red-dark); }
 .admin-block-card--career-tags .admin-block-card-type > span { background: #eeedf7; color: var(--admin-navy-700); }
 .admin-block-card--text .admin-block-card-type > span { background: #f9ecef; color: #8e243d; }
+.admin-block-card--branch-list .admin-block-card-type > span { background: #fff1df; color: #a3540b; }
+.admin-block-card--highlight .admin-block-card-type > span { background: #e9f5f1; color: #14705b; }
 .admin-block-card-type > div { display: flex; min-width: 0; flex-direction: column; }
 .admin-block-card-type small { color: #9894a5; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .admin-block-card-type strong { margin-top: 2px; color: var(--admin-navy-950); font-size: 0.74rem; }
@@ -515,6 +517,9 @@
 .admin-block-card-actions button.is-danger:hover { border-color: #efbfc1; background: #fdefef; }
 .admin-block-card-fields { display: grid; padding: 14px; grid-template-columns: minmax(180px, 0.7fr) minmax(280px, 1.3fr); align-items: start; gap: 13px; }
 .admin-block-card-fields textarea { min-height: 126px; }
+.admin-block-card-fields .admin-block-footer-field { grid-column: 2; }
+.admin-block-card-fields .admin-block-footer-field textarea { min-height: 84px; }
+.admin-optional { color: #9894a5; font-size: 0.64rem; font-weight: 600; }
 .admin-block-empty { display: flex; min-height: 150px; align-items: center; justify-content: center; flex-direction: column; padding: 24px; border: 1px dashed #cfccd9; border-radius: 14px; background: #fafafd; color: #aaa6b6; text-align: center; }
 .admin-block-empty strong { margin-top: 10px; color: #5d5870; font-size: 0.78rem; }
 .admin-block-empty span { margin-top: 4px; font-size: 0.67rem; }
@@ -671,6 +676,7 @@
   .admin-block-add-panel { grid-template-columns: 1fr; align-items: stretch; }
   .admin-block-add-description { min-height: 0; padding: 0; }
   .admin-block-card-fields { grid-template-columns: 1fr; }
+  .admin-block-card-fields .admin-block-footer-field { grid-column: auto; }
   .admin-application-filters { grid-template-columns: 1fr; align-items: stretch; }
   .admin-privacy-danger-zone { align-items: stretch; flex-direction: column; }
   .admin-privacy-danger-zone form,

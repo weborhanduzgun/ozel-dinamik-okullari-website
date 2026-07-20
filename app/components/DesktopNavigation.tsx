@@ -53,6 +53,14 @@ export function DesktopNavigation({ navigation }: { navigation: NavigationItem[]
           <div
             className={`desktop-nav-item${isOpen ? " is-open" : ""}`}
             key={menuKey}
+            onMouseEnter={() => setOpenMenu(menuKey)}
+            onMouseLeave={() => setOpenMenu(null)}
+            onFocusCapture={() => setOpenMenu(menuKey)}
+            onBlurCapture={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                setOpenMenu(null);
+              }
+            }}
           >
             <div className="desktop-nav-label">
               <Link className="desktop-nav-trigger" href={item.href}>

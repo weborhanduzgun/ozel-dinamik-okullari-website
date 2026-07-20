@@ -1050,7 +1050,6 @@ main > section[id] {
   }
 
   .mobile-menu nav > a,
-  .mobile-navigation-parent,
   .mobile-submenu-trigger {
     border-color: rgba(255, 255, 255, 0.08);
     color: #fff;

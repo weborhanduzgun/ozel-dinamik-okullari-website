@@ -21,6 +21,8 @@ export async function getStaffGroups(): Promise<StaffGroup[]> {
 }
 
 export async function getStaffMembers(): Promise<StaffMember[]> {
-  const groups = await getStaffGroups();
-  return groups.flatMap((group) => group.names.map((name) => ({ name, category: group.category, role: group.role })));
+  const db = getDb();
+  const rows = await db.select().from(schema.staff).orderBy(asc(schema.staff.sortOrder));
+
+  return rows.map(({ name, category, role }) => ({ name, category, role }));
 }
